@@ -1,0 +1,16 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - name: Env
+  - init: |
+      lua -v
+      luarocks -v
+
+  - name: 🛠🔗 Build Parser Lua Bindings
+    init: |
+      cd parser
+      mkdir build && \
+        cd build && \
+        cmake .. && \
+        make
