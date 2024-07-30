@@ -10,7 +10,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}" ${CMAKE_MODULE_PATH})
 # Find other dependencies
 
 add_subdirectory(libgraphqlparser EXCLUDE_FROM_ALL)
-include_directories("${CMAKE_SOURCE_DIR}/libgraphqlparser" "${CMAKE_BINARY_DIR}/libgraphqlparser")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/libgraphqlparser" "${CMAKE_CURRENT_BINARY_DIR}/libgraphqlparser")
 
 # Set CFLAGS
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -std=c11")

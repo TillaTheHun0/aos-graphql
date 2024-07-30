@@ -1,3 +1,4 @@
 [submodule "aos"]
 	path = aos
 	url = https://github.com/permaweb/aos
+	ignore = dirty

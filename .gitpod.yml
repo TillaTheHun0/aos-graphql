@@ -6,11 +6,14 @@ tasks:
   - init: |
       lua -v
       luarocks -v
-
-  - name: 🛠🔗 Build Parser Lua Bindings
+      ao --version
+  
+  - name: 🛠📊 Build GraphQL aos Module
     init: |
-      cd parser
       mkdir build && \
         cd build && \
         cmake .. && \
         make
+
+
+
