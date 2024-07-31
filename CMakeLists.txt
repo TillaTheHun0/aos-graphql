@@ -56,7 +56,7 @@ add_custom_command(
 add_dependencies(ao_build parser_build)
 
 # Clean up target
-add_custom_target(clean
+add_custom_target(default_clean
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${DEST_DIR}/graphql
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/parser --target clean
     COMMAND ${CMAKE_COMMAND} -E remove ${PROCESS_WASM_DEST}
@@ -65,5 +65,5 @@ add_custom_target(clean
 
 # Set the default target to build everything
 add_custom_target(default_all
-    DEPENDS clean parser_build ao_build
+    DEPENDS default_clean parser_build ao_build
 )
