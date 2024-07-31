@@ -8,12 +8,13 @@ tasks:
       luarocks -v
       ao --version
   
-  - name: 🛠📊 Build GraphQL aos Module
+  - name: 🛠📊 Build & Start GraphQL Module
     init: |
-      mkdir build && \
-        cd build && \
-        cmake .. && \
-        make
+      npm i
+      npm run build
+    command: 
+      npm start
 
-
-
+vscode:
+  extensions:
+    - "standard.vscode-standard"

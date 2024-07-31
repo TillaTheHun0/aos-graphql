@@ -1,0 +1,16 @@
+{
+  "name": "aos-graphql",
+  "description": "An aos module with a built-in graphql runtime implementation, complete with a native parser",
+  "type": "module",
+  "main": "repl.js",
+  "scripts": {
+    "start": "node --experimental-wasm-memory64 repl.js",
+    "build": "mkdir -p build && cd build && cmake .. && make"
+  },
+  "dependencies": {
+    "@permaweb/ao-loader": "^0.0.35"
+  },
+  "devDependencies": {
+    "standard": "^17.1.0"
+  }
+}
