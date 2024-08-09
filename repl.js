@@ -29,6 +29,13 @@ async function replWith ({ stream, env }) {
   })
 
   function createEval (line) {
+    if (line.startsWith('query') || line.startsWith('mutation')) {
+      line = `
+ao.server = ao.server or require('.server')
+ao.server('${line}')
+      `
+    }
+
     return {
       Id: 'message',
       Target: env.Process.Id,
