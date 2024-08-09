@@ -1,5 +1,5 @@
-local ffi = require('ffi')
-local util = require('graphql.util')
+-- local ffi = require('ffi')
+local util = require('.graphql.util')
 local format = string.format
 
 local function error(...)
@@ -246,13 +246,13 @@ local function isInt(value)
     return value >= -2^31 and value < 2^31 and math.floor(value) == value
   end
 
-  if type(value) == 'cdata' then
-    if ffi.istype('int64_t', value) then
-      return value >= -2^31 and value < 2^31
-    elseif ffi.istype('uint64_t', value) then
-      return value < 2^31
-    end
-  end
+  -- if type(value) == 'cdata' then
+  --   if ffi.istype('int64_t', value) then
+  --     return value >= -2^31 and value < 2^31
+  --   elseif ffi.istype('uint64_t', value) then
+  --     return value < 2^31
+  --   end
+  -- end
 
   return false
 end
@@ -285,9 +285,9 @@ local function isLong(value)
     return value > -2^53 and value < 2^53 and math.floor(value) == value
   end
 
-  if type(value) == 'cdata' then
-    return ffi.istype('int64_t', value) or ffi.istype('uint64_t', value)
-  end
+  -- if type(value) == 'cdata' then
+  --   return ffi.istype('int64_t', value) or ffi.istype('uint64_t', value)
+  -- end
 
   return false
 end
@@ -327,9 +327,9 @@ local function isFloat(value)
     return isfinite(value)
   end
 
-  if type(value) == 'cdata' then
-    return ffi.istype('int64_t', value) or ffi.istype('uint64_t', value)
-  end
+  -- if type(value) == 'cdata' then
+  --   return ffi.istype('int64_t', value) or ffi.istype('uint64_t', value)
+  -- end
 
   return false
 end

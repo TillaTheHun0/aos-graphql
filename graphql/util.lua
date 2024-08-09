@@ -1,5 +1,5 @@
-local ffi = require('ffi')
-local yaml = require('yaml').new({encode_use_tostring = true})
+-- local ffi = require('ffi')
+-- local yaml = require('yaml').new({encode_use_tostring = true})
 
 local function error(...)
   return _G.error(..., 0)
@@ -75,7 +75,8 @@ local function getTypeName(t)
     return ('List(%s)'):format(getTypeName(t.ofType))
   end
 
-  local err = ('Internal error: unknown type:\n%s'):format(yaml.encode(t))
+  -- local err = ('Internal error: unknown type:\n%s'):format(yaml.encode(t))
+  local err = ('Internal error: unknown type:\n%s'):format(t)
   error(err)
 end
 
@@ -261,8 +262,8 @@ local function cmpdeeply(got, expected)
         return got == expected
     end
 
-    if ffi.istype('bool', got) then got = (got == 1) end
-    if ffi.istype('bool', expected) then expected = (expected == 1) end
+    -- if ffi.istype('bool', got) then got = (got == 1) end
+    -- if ffi.istype('bool', expected) then expected = (expected == 1) end
 
     if type(got) ~= type(expected) then
         return false

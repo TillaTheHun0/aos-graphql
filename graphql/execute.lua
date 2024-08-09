@@ -1,8 +1,8 @@
-local introspection = require('graphql.introspection')
-local query_util = require('graphql.query_util')
-local types = require('graphql.types')
-local util = require('graphql.util')
-local validate_variables = require('graphql.validate_variables')
+local introspection = require('.graphql.introspection')
+local query_util = require('.graphql.query_util')
+local types = require('.graphql.types')
+local util = require('.graphql.util')
+local validate_variables = require('.graphql.validate_variables')
 
 local function error(...)
   return _G.error(..., 0)
@@ -400,7 +400,4 @@ local function execute(schema, tree, rootValue, variables, operationName)
   return evaluateSelections(rootType, rootValue, context.operation.selectionSet.selections, context)
 end
 
-
-return {
-  execute = execute,
-}
+return execute

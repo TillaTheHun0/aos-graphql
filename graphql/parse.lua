@@ -8,6 +8,4 @@ local function parse(s)
   return ast
 end
 
-return {
-  parse = parse,
-}
+return parse

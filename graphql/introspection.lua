@@ -1,5 +1,5 @@
-local types = require('graphql.types')
-local util = require('graphql.util')
+local types = require('.graphql.types')
+local util = require('.graphql.util')
 
 local __Schema, __Directive, __DirectiveLocation, __Type, __Field, __InputValue,__EnumValue, __TypeKind
 

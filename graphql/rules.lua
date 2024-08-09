@@ -1,7 +1,7 @@
-local introspection = require('graphql.introspection')
-local query_util = require('graphql.query_util')
-local types = require('graphql.types')
-local util = require('graphql.util')
+local introspection = require('.graphql.introspection')
+local query_util = require('.graphql.query_util')
+local types = require('.graphql.types')
+local util = require('.graphql.util')
 
 local function error(...)
   return _G.error(..., 0)
