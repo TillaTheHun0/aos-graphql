@@ -4,13 +4,11 @@ project(AOSGraphQL)
 
 # Define the source and destination directories
 set(GRAPHQL_SRC_DIR ${CMAKE_SOURCE_DIR}/graphql)
-set(SERVER_SRC ${CMAKE_SOURCE_DIR}/server.lua)
 set(PARSER_SRC_DIR ${CMAKE_SOURCE_DIR}/parser)
 # set(PARSER_SRC_DIR ${CMAKE_BINARY_DIR}/parser)
 
 set(DEST_DIR ${CMAKE_SOURCE_DIR}/aos/process)
 set(GRAPHQL_DEST_DIR ${DEST_DIR}/graphql)
-set(SERVER_DEST ${DEST_DIR}/server.lua)
 set(LIBS_DEST_DIR ${DEST_DIR}/libs)
 
 set(PROCESS_WASM_ARTIFACT ${DEST_DIR}/process.wasm)
@@ -39,13 +37,6 @@ add_custom_command(
     DEPENDS ${GRAPHQL_SRC_DIR}
 )
 
-# Custom target to copy GraphQL server
-add_custom_command(
-    OUTPUT ${SERVER_DEST}
-    COMMAND ${CMAKE_COMMAND} -E copy ${SERVER_SRC} ${SERVER_DEST}
-    COMMENT "Copying GraphQL server..."
-)
-
 # Custom target to build the parser project
 add_custom_target(parser_build ALL
     # COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/parser
@@ -70,7 +61,7 @@ add_custom_command(
 add_custom_target(ao_build ALL
     COMMAND ${CMAKE_COMMAND} -E chdir ${DEST_DIR} ao build
     COMMENT "Running 'ao build'..."
-    DEPENDS ${GRAPHQL_DEST_DIR} ${SERVER_DEST} ${LIBS_DEST_DIR}/libgraphqlparser.a ${LIBS_DEST_DIR}/luagraphqlparser.a
+    DEPENDS ${GRAPHQL_DEST_DIR} ${LIBS_DEST_DIR}/libgraphqlparser.a ${LIBS_DEST_DIR}/luagraphqlparser.a
 )
 
 # Custom command to copy the process.wasm file
@@ -88,7 +79,6 @@ add_dependencies(ao_build parser_build)
 add_custom_target(default_clean
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${GRAPHQL_DEST_DIR}
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIBS_DEST_DIR}
-    COMMAND ${CMAKE_COMMAND} -E remove ${SERVER_DEST}
     # COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/parser --target clean
     COMMENT "Cleaning up..."
 )

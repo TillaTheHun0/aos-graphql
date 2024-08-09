@@ -1,8 +1,13 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import readline from 'node:readline'
-import { createReadStream } from 'node:fs'
+import { createReadStream, readFileSync } from 'node:fs'
 import { Readable } from 'node:stream'
 
+import chalk from 'chalk'
 import AoLoader from '@permaweb/ao-loader'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 function binaryStream (USE_AOS) {
   if (USE_AOS) {
@@ -29,11 +34,18 @@ async function replWith ({ stream, env }) {
   })
 
   function createEval (line) {
-    if (line.startsWith('query') || line.startsWith('mutation')) {
-      line = `
-ao.server = ao.server or require('.server')
-ao.server('${line}')
-      `
+    if (line === 'sample-gql') {
+      console.log(chalk.blue('Initializing sample GraphQL Server at ao.server...'))
+      console.log(chalk.blue(`
+Example:
+
+ao.server('query GetPerson { person { firstName, lastName, age } }')
+ao.server('query GetPersons { persons { firstName, lastName } }')
+`))
+      const init = readFileSync(join(__dirname, 'server.lua'), 'utf-8')
+      line = `ao.server = ao.server or ${init}`
+    } else if (line.startsWith('query') || line.startsWith('mutation')) {
+      line = `return ao.server('${line}')`
     }
 
     return {

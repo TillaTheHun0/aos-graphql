@@ -8,7 +8,8 @@
     "build": "mkdir -p build && cd build && cmake .. && make"
   },
   "dependencies": {
-    "@permaweb/ao-loader": "^0.0.35"
+    "@permaweb/ao-loader": "^0.0.35",
+    "chalk": "^5.3.0"
   },
   "devDependencies": {
     "standard": "^17.1.0"
