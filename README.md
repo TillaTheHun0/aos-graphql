@@ -14,6 +14,7 @@ The goal is to demonstrate a functioning GraphQL server running inside an ao Pro
 
 ## Prerequisites
 
+- `ao` dev-cli `0.1.3`
 - `cmake` and `make` 
 - If running the `repl.js`, you'll need `NodeJS 22+` and `npm`
 
@@ -21,7 +22,7 @@ The goal is to demonstrate a functioning GraphQL server running inside an ao Pro
 
 Initialize the `aos` submodule using `git submodule update --init`. You can update the submodule to latest by running `git submodule update --remote`.
 
-Then either run `cmake`, or if you have `npm`, simply run `npm run build`.
+Then either use `cmake`, or if you have `npm`, simply run `npm run build` to produce the wasm with a built-in graphql runtime implementation
 
 > If using the `repl.js` you'll need to also install dependencies using `npm i`
 
@@ -36,12 +37,34 @@ Lua requires bindings in order to invoke the C parser, which is implemented [her
 When running the root `cmake`:
 
 - The C implementation is compiled into a static library (`.a`)
-- The Lua bindings are then compiled, along with the compiled C implementation into a shared object `.so`
-- The Lua implementation of the GraphQL runtime, along with the `.so` are copied in `aos/process/graphql`
+- The Lua bindings are then compiled, along with the compiled C implementation into a static library `.a`
+- The Lua implementation of the GraphQL runtime, along with the `.a` are copied in `aos/process/graphql` and `aos/process/libs`
 - The `ao` dev-cli is used to build the aos process code into a `process.wasm`, which is then copied to the root of the repo, to be loaded by the `repl.js`, if desired.
 
-## Current State
+## Sample GraphQL
 
-It doesn't seem like the `process.wasm` is able to resolve code from the `.so` file, despite `emcc-lua` doing some parsing in order expose the function declarations to Lua, within the bundled C file compiled to produce the `process.wasm`
+A sample graphql server is implemented in `server.lua` and can be hotloaded via the `repl.js` using executing `sample-gql`
 
-Here be 🐉s
+## Known Outstanding Issues
+
+The parser cannot parse operations that contain arguments or variables. The following error is produced, suggesting a function pointer has been set to null or signature does not match:
+
+```
+Error:  RuntimeError: null function or function signature mismatch
+    at process.wasm.CVisitorBridge::endVisitStringValue(facebook::graphql::ast::StringValue const&) (wasm://wasm/process.wasm-004d2fda:wasm-function[1091]:0x9d87d)
+    at process.wasm.facebook::graphql::ast::StringValue::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1172]:0xa4ca1)
+    at process.wasm.facebook::graphql::ast::Argument::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1165]:0xa41a9)
+    at process.wasm.facebook::graphql::ast::Field::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1164]:0xa3f4a)
+    at process.wasm.facebook::graphql::ast::SelectionSet::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1163]:0xa3d0e)
+    at process.wasm.facebook::graphql::ast::OperationDefinition::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1161]:0xa39b7)
+    at process.wasm.facebook::graphql::ast::Document::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1160]:0xa36f1)
+    at process.wasm.graphql_parse (wasm://wasm/process.wasm-004d2fda:wasm-function[1027]:0x8fdee)
+    at process.wasm.luaD_precall (wasm://wasm/process.wasm-004d2fda:wasm-function[116]:0xbb1f)
+    at process.wasm.luaV_execute (wasm://wasm/process.wasm-004d2fda:wasm-function[266]:0x2fff0)
+```
+
+Sample operations that will reproduce the error:
+
+```
+query GetPerson { person (id: "id-2") { firstName, lastName, age } }
+```
