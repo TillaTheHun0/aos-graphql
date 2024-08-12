@@ -46,25 +46,3 @@ When running the root `cmake`:
 A sample graphql server is implemented in `server.lua` and can be hotloaded via the `repl.js` using executing `sample-gql`
 
 ## Known Outstanding Issues
-
-The parser cannot parse operations that contain arguments or variables. The following error is produced, suggesting a function pointer has been set to null or signature does not match:
-
-```
-Error:  RuntimeError: null function or function signature mismatch
-    at process.wasm.CVisitorBridge::endVisitStringValue(facebook::graphql::ast::StringValue const&) (wasm://wasm/process.wasm-004d2fda:wasm-function[1091]:0x9d87d)
-    at process.wasm.facebook::graphql::ast::StringValue::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1172]:0xa4ca1)
-    at process.wasm.facebook::graphql::ast::Argument::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1165]:0xa41a9)
-    at process.wasm.facebook::graphql::ast::Field::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1164]:0xa3f4a)
-    at process.wasm.facebook::graphql::ast::SelectionSet::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1163]:0xa3d0e)
-    at process.wasm.facebook::graphql::ast::OperationDefinition::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1161]:0xa39b7)
-    at process.wasm.facebook::graphql::ast::Document::accept(facebook::graphql::ast::visitor::AstVisitor*) const (wasm://wasm/process.wasm-004d2fda:wasm-function[1160]:0xa36f1)
-    at process.wasm.graphql_parse (wasm://wasm/process.wasm-004d2fda:wasm-function[1027]:0x8fdee)
-    at process.wasm.luaD_precall (wasm://wasm/process.wasm-004d2fda:wasm-function[116]:0xbb1f)
-    at process.wasm.luaV_execute (wasm://wasm/process.wasm-004d2fda:wasm-function[266]:0x2fff0)
-```
-
-Sample operations that will reproduce the error:
-
-```
-query GetPerson { person (id: "id-2") { firstName, lastName, age } }
-```
