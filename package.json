@@ -5,7 +5,7 @@
   "main": "repl.js",
   "scripts": {
     "start": "node --experimental-wasm-memory64 repl.js",
-    "build": "mkdir -p build && cd build && cmake .. && make"
+    "build": "mkdir -p build && cd build && cmake .. && make clean all"
   },
   "dependencies": {
     "@permaweb/ao-loader": "^0.0.35",
