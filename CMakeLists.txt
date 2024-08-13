@@ -9,6 +9,7 @@ set(GRAPHQL_RUNTIME_SRC_DIR ${PACKAGES_DIR}/runtime)
 set(GRAPHQL_SRC_DIR ${GRAPHQL_RUNTIME_SRC_DIR}/graphql)
 set(PARSER_SRC_DIR ${GRAPHQL_RUNTIME_SRC_DIR}/parser)
 # set(PARSER_SRC_DIR ${CMAKE_BINARY_DIR}/parser)
+set(GRAPHQL_SERVER_SRC_DIR ${PACKAGES_DIR}/server)
 
 set(DEST_DIR ${CMAKE_SOURCE_DIR}/aos/process)
 set(GRAPHQL_DEST_DIR ${DEST_DIR}/graphql)
@@ -31,13 +32,14 @@ set(AO_IMAGE p3rmaw3b/ao:0.1.2)
 # Add the parser subdirectory
 add_subdirectory(${PARSER_SRC_DIR})
 
-# Custom target to copy GraphQL impl
+# Custom target to copy GraphQL runtime and server impl
 add_custom_command(
     OUTPUT ${GRAPHQL_DEST_DIR}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${GRAPHQL_DEST_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${GRAPHQL_SRC_DIR} ${GRAPHQL_DEST_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${GRAPHQL_SERVER_SRC_DIR} ${GRAPHQL_DEST_DIR}/server
     COMMENT "Copying GraphQL files..."
-    DEPENDS ${GRAPHQL_SRC_DIR}
+    DEPENDS ${GRAPHQL_SRC_DIR} ${GRAPHQL_SERVER_SRC_DIR}
 )
 
 # Custom target to build the parser project

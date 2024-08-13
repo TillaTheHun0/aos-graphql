@@ -39,7 +39,7 @@ async function replWith ({ stream, env }) {
       console.log(chalk.blue(`
 Example:
 
-ao.server('query GetPerson { person { firstName, lastName, age } }')
+ao.server('query GetPerson ($id: ID!) { person (id: $id) { firstName, lastName, age } }', { id = "id-2" })
 ao.server('query GetPersons { persons { firstName, lastName } }')
 `))
       const init = readFileSync(join(__dirname, 'server.lua'), 'utf-8')

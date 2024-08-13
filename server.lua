@@ -1,9 +1,8 @@
 (function ()
-  local parse = require('.graphql.parse')
   local schema = require('.graphql.schema')
   local types = require('.graphql.types')
-  local validate = require('.graphql.validate')
-  local execute = require('.graphql.execute')
+
+  local server = require('.graphql.server.init')
 
   local function reduce (fn, initial, t)
     assert(type(fn) == "function", "first argument should be a function that accepts (result, value, key)")
@@ -39,7 +38,8 @@
     id = 'id-2',
     firstName = 'Jane',
     lastName = 'Doe',
-    age = 40
+    age = 40,
+    friends = {Bob.id}
   }
   local John = {
     id = 'id-3',
@@ -66,20 +66,13 @@
         id = types.id.nonNull,
         firstName = types.string.nonNull,
         lastName = types.string.nonNull,
-        age = {
-          kind = types.int.nonNull,
-          resolve = function (parent, _, contextValue)
-            print(contextValue)
-            return parent.age + 23
-          end
-        },
+        age = types.int.nonNull,
         friends = {
           kind = types.list(Person.nonNull).nonNull,
-          resolve = function (rootValue)
-            local person = dbById[rootValue.id]
-            print("person", person)
+          resolve = function (parent, _, contextValue)
+            local person = contextValue.dbById[parent.id]
             return map(
-              function (id) return { id = id } end,
+              function (id) return contextValue.dbById[id] end,
               person.friends or {}
             )
           end
@@ -94,16 +87,15 @@
     arguments = {
       id = types.id
     },
-    resolve = function (rootValue, arguments, contextValue)
-      print(contextValue)
-      return dbById[arguments.id or 'id-3']
+    resolve = function (_, arguments, contextValue)
+      return contextValue.dbById[arguments.id or 'id-3']
     end
   }
 
   local PersonsQuery = {
     kind = types.list(Person.nonNull).nonNull,
-    resolve = function (rootValue)
-      return db
+    resolve = function (_, _, contextValue)
+      return contextValue.db
     end
   }
 
@@ -118,25 +110,10 @@
     })
   })
 
-  local server = function (_schema)
-    return function (operation, variables)
-      -- TODO: arguments seem to break parsing
-      local ast = parse(operation)
+  local gql = server.create({
+    schema = Schema,
+    context = function () return { db = db, dbById = dbById } end
+  })
 
-      -- Validate a parsed query against a schema
-      validate(_schema, ast)
-
-      -- TODO: Shouldn't this be nil?
-      local rootValue = {}
-      local contextValue = { foo = 'bar' }
-      -- TODO: Does this lock down the operation to specific named operations?
-      -- TODO: can we grab from ast?
-      local operationName = nil
-
-      local result = execute(_schema, ast, rootValue, contextValue, variables, operationName)
-      return result
-    end
-  end
-
-  return server(Schema)
+  return gql
 end)()
