@@ -8,6 +8,17 @@
 
 This is a PoC for implementing the GraphQL Runtime in ao.
 
+<!-- toc -->
+
+- [Goals](#goals)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [How it works](#how-it-works)
+- [Sample GraphQL](#sample-graphql)
+- [Known Outstanding Issues](#known-outstanding-issues)
+
+<!-- tocstop -->
+
 ## Goals
 
 The goal is to demonstrate a functioning GraphQL server running inside an ao Process. This involves receive a GraphQL operation, parsing it, resolving it, then returning the result as a Lua table.
@@ -30,9 +41,9 @@ Then either use `cmake`, or if you have `npm`, simply run `npm run build` to pro
 
 The Lua implementation of the GraphQL runtime is located in the `graphql` folder.
 
-The Lua implementation depends on a a [pure C implementation](./parser/libgraphqlparser) of a GraphQL operation parser, `libgraphqlparser`, copied from [The GraphQL foundation here](https://github.com/graphql/libgraphqlparser).
+The Lua implementation depends on a a [pure C implementation](./packages/runtime/parser/libgraphqlparser) of a GraphQL operation parser, `libgraphqlparser`, copied from [The GraphQL foundation here](https://github.com/graphql/libgraphqlparser).
 
-Lua requires bindings in order to invoke the C parser, which is implemented [here](./parser/luagraphqlparser)
+Lua requires bindings in order to invoke the C parser, which are implemented [here](./packages/runtime/parser/luagraphqlparser)
 
 When running the root `cmake`:
 
