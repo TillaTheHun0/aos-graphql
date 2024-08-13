@@ -1,8 +1,16 @@
 # lua-graphql
 
-An implementation of the GraphQL runtime implemented in Lua.
+An Lua implementation of the GraphQL runtime.
 
-Based on [this fork](https://github.com/tarantool/graphql)
+Originally forked from
+[this implementation](https://github.com/tarantool/graphql). Thank you for the
+fantastic work so far on this implementation.
+
+<!-- toc -->
+
+- [Usage](#usage)
+
+<!-- tocstop -->
 
 ## Usage
 
@@ -45,7 +53,7 @@ local schema = schema.create({
         arguments = {
           id = types.id
         },
-        resolve = function(rootValue, arguments)
+        resolve = function(rootValue, arguments, context, info)
           if arguments.id ~= 1 then return nil end
 
           return {
@@ -65,10 +73,11 @@ validate(schema, ast)
 
 -- Execution
 local rootValue = {}
+local contextValue = {}
 local variables = { id = 1 }
 local operationName = 'getUser'
 
-execute(schema, ast, rootValue, variables, operationName)
+execute(schema, ast, rootValue, contextValue, variables, operationName)
 
 --[[
 {

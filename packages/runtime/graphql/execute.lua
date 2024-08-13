@@ -70,7 +70,7 @@ local function mergeSelectionSets(fields)
   return selections
 end
 
-local function defaultResolver(object, _, info)
+local function defaultResolver(object, _, _, info)
   return object[info.fieldASTs[1].name.value]
 end
 
@@ -124,13 +124,14 @@ local function getVariableTypes(schema, operation)
     return variableTypes
 end
 
-local function buildContext(schema, tree, rootValue, variables, operationName)
+local function buildContext(schema, tree, rootValue, contextValue, variables, operationName)
   local operation = getOperation(tree, operationName)
   local fragmentMap = getFragmentDefinitions(tree)
   local variableTypes = getVariableTypes(schema, operation)
   return {
       schema = schema,
       rootValue = rootValue,
+      contextValue = contextValue,
       variables = variables,
       operation = operation,
       fragmentMap = fragmentMap,
@@ -338,7 +339,7 @@ local function getFieldEntry(objectType, object, fields, context)
     directivesDefaultValues = context.schema.directivesDefaultValues,
   }
 
-  local resolvedObject, err = (fieldType.resolve or defaultResolver)(object, arguments, info)
+  local resolvedObject, err = (fieldType.resolve or defaultResolver)(object, arguments, context.contextValue, info)
   if resolvedObject == nil and err ~= nil then
     error(err)
   end
@@ -387,8 +388,8 @@ evaluateSelections = function(objectType, object, selections, context)
   return result, context.errors
 end
 
-local function execute(schema, tree, rootValue, variables, operationName)
-  local context = buildContext(schema, tree, rootValue, variables, operationName)
+local function execute(schema, tree, rootValue, contextValue, variables, operationName)
+  local context = buildContext(schema, tree, rootValue, contextValue, variables, operationName)
   local rootType = schema[context.operation.operation]
 
   if not rootType then

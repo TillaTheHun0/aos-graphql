@@ -1,4 +1,3 @@
-
 (function ()
   local parse = require('.graphql.parse')
   local schema = require('.graphql.schema')
@@ -17,6 +16,17 @@
       end
     end
     return result
+  end
+
+  local function map (fn, t)
+    return reduce(
+      function (result, v, k)
+        result[k] = fn(v, k)
+        return result
+      end,
+      {},
+      t
+    )
   end
 
   local Bob = {
@@ -49,14 +59,33 @@
   )
 
   -- Create a type
-  local Person = types.object({
+  Person = types.object({
     name = 'Person',
-    fields = {
-      id = types.id.nonNull,
-      firstName = types.string.nonNull,
-      lastName = types.string.nonNull,
-      age = types.int.nonNull
-    }
+    fields = function ()
+      return {
+        id = types.id.nonNull,
+        firstName = types.string.nonNull,
+        lastName = types.string.nonNull,
+        age = {
+          kind = types.int.nonNull,
+          resolve = function (parent, _, contextValue)
+            print(contextValue)
+            return parent.age + 23
+          end
+        },
+        friends = {
+          kind = types.list(Person.nonNull).nonNull,
+          resolve = function (rootValue)
+            local person = dbById[rootValue.id]
+            print("person", person)
+            return map(
+              function (id) return { id = id } end,
+              person.friends or {}
+            )
+          end
+        }
+      }
+    end
   })
 
   -- Create a Query
@@ -65,7 +94,8 @@
     arguments = {
       id = types.id
     },
-    resolve = function (rootValue, arguments)
+    resolve = function (rootValue, arguments, contextValue)
+      print(contextValue)
       return dbById[arguments.id or 'id-3']
     end
   }
@@ -98,11 +128,12 @@
 
       -- TODO: Shouldn't this be nil?
       local rootValue = {}
+      local contextValue = { foo = 'bar' }
       -- TODO: Does this lock down the operation to specific named operations?
       -- TODO: can we grab from ast?
       local operationName = nil
 
-      local result = execute(_schema, ast, rootValue, variables, operationName)
+      local result = execute(_schema, ast, rootValue, contextValue, variables, operationName)
       return result
     end
   end
