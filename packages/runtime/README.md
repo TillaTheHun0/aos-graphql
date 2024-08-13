@@ -1,5 +1,7 @@
 # lua-graphql
 
+An implementation of the GraphQL runtime implemented in Lua.
+
 Based on [this fork](https://github.com/tarantool/graphql)
 
 ## Usage

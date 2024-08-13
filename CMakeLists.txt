@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(AOSGraphQL)
 
+set(PACKAGES_DIR ${CMAKE_SOURCE_DIR}/packages)
+
 # Define the source and destination directories
-set(GRAPHQL_SRC_DIR ${CMAKE_SOURCE_DIR}/graphql)
-set(PARSER_SRC_DIR ${CMAKE_SOURCE_DIR}/parser)
+set(GRAPHQL_RUNTIME_SRC_DIR ${PACKAGES_DIR}/runtime)
+set(GRAPHQL_SRC_DIR ${GRAPHQL_RUNTIME_SRC_DIR}/graphql)
+set(PARSER_SRC_DIR ${GRAPHQL_RUNTIME_SRC_DIR}/parser)
 # set(PARSER_SRC_DIR ${CMAKE_BINARY_DIR}/parser)
 
 set(DEST_DIR ${CMAKE_SOURCE_DIR}/aos/process)
@@ -26,7 +29,7 @@ NO_EXIT_RUNTIME=1 -Wno-unused-command-line-argument -Wno-experimental /lua-5.3.4
 set(AO_IMAGE p3rmaw3b/ao:0.1.2)
 
 # Add the parser subdirectory
-add_subdirectory(parser)
+add_subdirectory(${PARSER_SRC_DIR})
 
 # Custom target to copy GraphQL impl
 add_custom_command(
