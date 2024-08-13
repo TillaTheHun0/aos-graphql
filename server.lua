@@ -1,6 +1,7 @@
 (function ()
-  local schema = require('.graphql.schema')
-  local types = require('.graphql.types')
+  local graphql = require('.graphql.init')
+
+  local schema, types = graphql.schema, graphql.types
 
   local server = require('.graphql.server.init')
 

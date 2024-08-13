@@ -1,4 +1,5 @@
 {
   "watch": ["repl.js", "process.wasm"],
-  "exec": "node --experimental-wasm-memory64 repl.js"
+  "exec": "node --experimental-wasm-memory64 repl.js",
+  "delay": 500
 } 
