@@ -44,6 +44,15 @@ ao.server('query GetPersons { persons { firstName, lastName } }')
 `))
       const init = readFileSync(join(__dirname, 'server.lua'), 'utf-8')
       line = `ao.server = ao.server or ${init}`
+    } else if (line === 'gateway') {
+      console.log(chalk.green('Initializing Arweave GraphQL Gatewway at ao.server...'))
+      console.log(chalk.green(`
+Example:
+
+ao.server('query Introspection { __schema { types { name } } }')
+`))
+      const init = readFileSync(join(__dirname, 'gateway.lua'), 'utf-8')
+      line = `ao.server = ao.server or ${init}`
     } else if (line.startsWith('query') || line.startsWith('mutation')) {
       line = `return ao.server('${line}')`
     }
