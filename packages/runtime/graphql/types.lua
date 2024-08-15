@@ -235,6 +235,8 @@ function types.inputObject(config)
     fields = fields,
   }
 
+  instance.nonNull = types.nonNull(instance)
+
   types.get_env(config.schema)[config.name] = instance
 
   return instance
