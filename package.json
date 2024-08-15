@@ -6,6 +6,7 @@
   "main": "repl.js",
   "scripts": {
     "build": "mkdir -p build && cd build && cmake .. && make clean all",
+    "dev": "nodemon",
     "preinstall": "npx only-allow npm",
     "prepare": "husky",
     "staged": "lint-staged",
@@ -19,6 +20,7 @@
     "husky": "^9.1.4",
     "lint-staged": "^15.2.8",
     "markdown-toc-gen": "^1.0.1",
+    "nodemon": "^3.1.4",
     "only-allow": "^1.2.1",
     "sort-package-json": "^2.10.0",
     "standard": "^17.1.0"

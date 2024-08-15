@@ -1,0 +1,4 @@
+{
+  "watch": ["repl.js", "process.wasm"],
+  "exec": "node --experimental-wasm-memory64 repl.js"
+} 
