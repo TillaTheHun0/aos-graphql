@@ -6,21 +6,21 @@ local schema = require('.graphql.gateway.schema.init')
 
 local function createServer (kind)
   return function (args)
-    local persistence = args.persistence
+    local pType, pClient = args.persistence.type, args.persistence.client
     local dal
 
     -- Create Data Access Layer
-    if persistence.type == 'sqlite' then
-      dal = require('.graphql.gateway.dal.sqlite')({ client = persistence.client })
+    if pType == 'sqlite_json' then
+      dal = require('.graphql.gateway.dal.sqlite_json.init')({ client = pClient })
     else
-      assert(false, 'Persistence engine "' .. persistence.type .. '" not supported. Valid options are: [sqlite]')
+      assert(false, string.format('Persistence engine "%s" not implemented. Valid types are: [sqlite_json]', pType))
     end
 
     -- Compose Business logic on top of data access layer
     local apis = api.createApis({ dal = dal })
 
     -- Create the GraphQL Server
-    return server[kind]({
+    local gql = server[kind]({
       schema = schema,
       context = function (info)
         -- Expose apis on contextValue to all resolvers
@@ -28,6 +28,20 @@ local function createServer (kind)
         return contextValue
       end
     })
+
+    -- We expose this api, so that transactions used to power the graph can be saved
+    gql.saveTransaction = apis.saveTransaction
+
+    if kind == 'aos' then
+      --[[
+        TODO: add handler to treat incoming msgs as transactions
+        to save in persistence
+      ]]
+
+      Handlers.append()
+    end
+
+    return gql
   end
 end
 

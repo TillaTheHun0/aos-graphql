@@ -276,7 +276,7 @@ local TransactionsQuery = {
   resolve = function (_, arguments, ctx)
     local findTransactions = ctx.findTransactions
 
-    local limit = utils.clamp(1, 1000, arguments.first or 10)
+    local limit = arguments.first
 
     local sort = arguments.sort == SortOrderEnum.values.HEIGHT_DESC.value
       and 'desc'
