@@ -5,6 +5,7 @@ project(AOSGraphQL)
 set(PACKAGES_DIR ${CMAKE_SOURCE_DIR}/packages)
 
 # Define the source and destination directories
+set(PROCESS_CONFIG_SRC ${PACKAGES_DIR}/config/config.yml)
 set(GRAPHQL_RUNTIME_SRC_DIR ${PACKAGES_DIR}/runtime)
 set(GRAPHQL_SRC_DIR ${GRAPHQL_RUNTIME_SRC_DIR}/graphql)
 set(PARSER_SRC_DIR ${GRAPHQL_RUNTIME_SRC_DIR}/parser)
@@ -15,6 +16,7 @@ set(GRAPHQL_GATEWAY_SRC_DIR ${PACKAGES_DIR}/gateway)
 set(DEST_DIR ${CMAKE_SOURCE_DIR}/aos/process)
 set(GRAPHQL_DEST_DIR ${DEST_DIR}/graphql)
 set(LIBS_DEST_DIR ${DEST_DIR}/libs)
+set(PROCESS_CONFIG_DEST ${DEST_DIR}/config.yml)
 
 set(PROCESS_WASM_ARTIFACT ${DEST_DIR}/process.wasm)
 set(PROCESS_WASM_DEST ${CMAKE_SOURCE_DIR}/process.wasm)
@@ -22,7 +24,7 @@ set(PROCESS_WASM_DEST ${CMAKE_SOURCE_DIR}/process.wasm)
 set(EMXX_CFLAGS "-s MEMORY64=1 -O3 -msimd128 -fno-rtti -DNDEBUG \
 -flto=full -s BUILD_AS_WORKER=1 -s EXPORT_ALL=1 \
 -s EXPORT_ES6=1 -s MODULARIZE=1 -s INITIAL_MEMORY=10MB \
--s MAXIMUM_MEMORY=4GB -s ALLOW_MEMORY_GROWTH -s FORCE_FILESYSTEM=1 \
+-s MAXIMUM_MEMORY=8GB -s ALLOW_MEMORY_GROWTH -s FORCE_FILESYSTEM=1 \
 -s EXPORTED_FUNCTIONS=_main -s EXPORTED_RUNTIME_METHODS=callMain -s \
 NO_EXIT_RUNTIME=1 -Wno-unused-command-line-argument -Wno-experimental /lua-5.3.4/src/liblua.a -I/lua-5.3.4/src"
 )
@@ -64,11 +66,18 @@ add_custom_command(
     DEPENDS parser_build
 )
 
+# Custom target to copy process config
+add_custom_command(
+    OUTPUT ${PROCESS_CONFIG_DEST}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROCESS_CONFIG_SRC} ${PROCESS_CONFIG_DEST}
+    COMMENT "Copying process config libraries..."
+)
+
 # Custom target to run "ao build" in the aos/pocess directory
 add_custom_target(ao_build ALL
     COMMAND ${CMAKE_COMMAND} -E chdir ${DEST_DIR} ao build
     COMMENT "Running 'ao build'..."
-    DEPENDS ${GRAPHQL_DEST_DIR} ${LIBS_DEST_DIR}/libgraphqlparser.a ${LIBS_DEST_DIR}/luagraphqlparser.a
+    DEPENDS ${GRAPHQL_DEST_DIR} ${PROCESS_CONFIG_DEST} ${LIBS_DEST_DIR}/libgraphqlparser.a ${LIBS_DEST_DIR}/luagraphqlparser.a
 )
 
 # Custom command to copy the process.wasm file
@@ -86,6 +95,7 @@ add_dependencies(ao_build parser_build)
 add_custom_target(default_clean
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${GRAPHQL_DEST_DIR}
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIBS_DEST_DIR}
+    COMMAND ${CMAKE_COMMAND} -E remove ${PROCESS_CONFIG_DEST}
     # COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/parser --target clean
     COMMENT "Cleaning up..."
 )
