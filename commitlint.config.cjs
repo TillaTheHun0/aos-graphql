@@ -33,6 +33,7 @@ module.exports = {
   rules: {
     ...RequireScopes([
       'repo', // denotes repo-wide changes ie. monorepo tooling, monorepo docs etc.
+      'aos', // aos submodule bumping
       ...findDirectories(path.join(__dirname, 'packages'))
     ])
   }
