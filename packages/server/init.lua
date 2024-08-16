@@ -41,7 +41,7 @@ server.aos = function (args)
   })
 
   -- Add an aos Handler that will handle any GraphQL actions
-  Handlers.add(
+  Handlers.prepend(
     "graphql",
     function (msg) return msg.Tags.Action == 'GraphQL' end,
     function (msg)
