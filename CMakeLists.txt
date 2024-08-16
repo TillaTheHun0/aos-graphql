@@ -12,6 +12,7 @@ set(PARSER_SRC_DIR ${GRAPHQL_RUNTIME_SRC_DIR}/parser)
 # set(PARSER_SRC_DIR ${CMAKE_BINARY_DIR}/parser)
 set(GRAPHQL_SERVER_SRC_DIR ${PACKAGES_DIR}/server)
 set(GRAPHQL_GATEWAY_SRC_DIR ${PACKAGES_DIR}/gateway)
+set(AO_LIBS_SRC_DIR ${CMAKE_SOURCE_DIR}/ao_libs)
 
 set(DEST_DIR ${CMAKE_SOURCE_DIR}/aos/process)
 set(GRAPHQL_DEST_DIR ${DEST_DIR}/graphql)
@@ -59,7 +60,10 @@ add_custom_target(parser_build ALL
 add_custom_command(
     OUTPUT ${LIBS_DEST_DIR}/libgraphqlparser.a
     OUTPUT ${LIBS_DEST_DIR}/luagraphqlparser.a
+    OUTPUT ${LIBS_DEST_DIR}/lsqlite3.a
+    OUTPUT ${LIBS_DEST_DIR}/sqlite3.a
     COMMAND ${CMAKE_COMMAND} -E make_directory ${LIBS_DEST_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${AO_LIBS_SRC_DIR} ${LIBS_DEST_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${PARSER_SRC_DIR}/build/libgraphqlparser/libgraphqlparser.a ${LIBS_DEST_DIR}/libgraphqlparser.a
     COMMAND ${CMAKE_COMMAND} -E copy ${PARSER_SRC_DIR}/build/luagraphqlparser/luagraphqlparser.a ${LIBS_DEST_DIR}/luagraphqlparser.a
     COMMENT "Copying static libraries..."
