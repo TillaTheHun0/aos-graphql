@@ -1,6 +1,6 @@
 (function ()
   local gateway = require('.graphql.gateway.init')
 
-  local gql = gateway.create()
-  return gql
+  local gql, apis = gateway.create({ continue = true })
+  return gql, apis
 end)()
