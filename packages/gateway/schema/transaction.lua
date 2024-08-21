@@ -204,11 +204,11 @@ local TransactionQuery = {
     id = types.id.nonNull
   },
   resolve = function (_, arguments, ctx)
-    local findTransaction = ctx.findTransaction
+    local findTransactionById = ctx.findTransactionById
 
     local id = arguments.id
 
-    return findTransaction(id)
+    return findTransactionById(id)
   end
 }
 

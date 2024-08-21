@@ -1,15 +1,15 @@
 local utils = {}
 
-utils.isArray = function (table)
-  if type(table) == "table" then
+utils.isArray = function (t)
+  if type(t) == "table" then
     local maxIndex = 0
-    for k, v in pairs(table) do
+    for k, v in pairs(t) do
       -- If there's a non-integer key, it's not an array, so immediately return
       if type(k) ~= "number" or k < 1 or math.floor(k) ~= k then return false end
       maxIndex = math.max(maxIndex, k)
     end
     -- If the highest numeric index is equal to the number of elements, it's an array
-    return maxIndex == #table
+    return maxIndex == #t
   end
   return false
 end
@@ -82,6 +82,12 @@ end, 3)
 
 utils.startsWith = function (str, start)
   return string.sub(str, 1, string.len(start)) == start
+end
+
+utils.isEmpty = function (t) return next(t) == nil end
+
+utils.complement = function (fn)
+  return function (...) return not fn(...) end
 end
 
 return utils

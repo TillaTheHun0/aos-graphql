@@ -46,9 +46,34 @@ local function createApis (args)
     return transactions, nextTransaction
   end
 
-  apis.saveTransaction = function (transaction)
-    -- TODO map transaction to doc
-    local doc = {}
+  --[[
+    TODO: some fields are not present on a msg and so are currently mapped to nil:
+    - fee
+    - quantity
+    - bundle_id
+    - block related metadata (timestamp, id, previous -- we _do_ have height)
+  ]]
+  apis.saveTransaction = function (msg)
+    local doc = {
+      id = msg.Id,
+      anchor = msg.Anchor,
+      signature = msg.Signature,
+      owner = {
+        address = msg.Owner
+      },
+      fee = nil,
+      quantity = nil,
+      tags = msg.TagArray,
+      block = {
+        id = nil,
+        height = msg['Block-Height'],
+        timestamp = nil,
+        previous = nil
+      },
+      bundle_id = nil,
+      target = msg.Target,
+      timestamp = msg.Timestamp
+    }
 
     dal.saveTransaction(doc)
 

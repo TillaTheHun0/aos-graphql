@@ -4,16 +4,27 @@ local utils = require('.graphql.gateway.utils')
 local api = require('.graphql.gateway.api')
 local schema = require('.graphql.gateway.schema.init')
 
+local function maybeRequire(moduleName)
+  local ok, result, err = pcall(require, moduleName)
+  if ok then return ok, result
+  else return ok, err end
+end
+
 local function createServer (kind)
   return function (args)
-    local pType, pClient = args.persistence.type, args.persistence.client
-    local dal
+    args = args or {}
+    args.persistence = args.persistence or {}
+    -- Persistence defaults to sqlite_json
+    local pType = args.persistence.type or 'sqlite_json'
 
     -- Create Data Access Layer
-    if pType == 'sqlite_json' then
-      dal = require('.graphql.gateway.dal.sqlite_json.init')({ client = pClient })
+    local ok, dal = maybeRequire('.graphql.gateway.dal.' .. pType .. '.init')
+    -- local ok, dal = true, require('.graphql.gateway.dal.sqlite_json.init')
+    if ok then
+      -- pass args.persistence as options to dal implementation
+      dal = dal(args.persistence)
     else
-      assert(false, string.format('Persistence engine "%s" not implemented. Valid types are: [sqlite_json]', pType))
+      assert(false, string.format('Persistence engine "%s" could not be loaded: %s', pType, tostring(dal)))
     end
 
     -- Compose Business logic on top of data access layer
@@ -29,19 +40,31 @@ local function createServer (kind)
       end
     })
 
-    -- We expose this api, so that transactions used to power the graph can be saved
-    gql.saveTransaction = apis.saveTransaction
-
+    --[[
+      Automatically attach an aos handler after the graphql handler
+      that will save all messages that are not crons to the indexer
+    ]]
     if kind == 'aos' then
-      --[[
-        TODO: add handler to treat incoming msgs as transactions
-        to save in persistence
-      ]]
+      Handlers.after('graphql').add(
+        'saveTransaction',
+        function (msg)
+          if msg.Cron then return false end
 
-      Handlers.append()
+          -- keep flowing through subsequent handlers
+          if args.continue then return 'continue' end
+
+          -- stop handler flow after this one executes
+          return true
+        end,
+        function (msg)
+          apis.saveTransaction(msg)
+          print(string.format('Saved msg "%s". You may query it from the graph', msg.Id))
+        end
+      )
     end
 
-    return gql
+    -- Expose both the gql server and the bl apis
+    return gql, apis
   end
 end
 
