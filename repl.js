@@ -6,6 +6,7 @@ import { Readable } from 'node:stream'
 import { randomInt, randomUUID } from 'node:crypto'
 
 import chalk from 'chalk'
+import luaJson from 'lua-json'
 import AoLoader from '@permaweb/ao-loader'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -16,6 +17,19 @@ function binaryStream (USE_AOS) {
     return fetch('https://arweave.net/raw/xT0ogTeagEGuySbKuUoo_NaWeeBv1fZ4MqgDdKVKY0U').then(res => res.body)
   }
   return Promise.resolve(Readable.toWeb(createReadStream('./process.wasm')))
+}
+
+function toTable (obj) {
+  const t = luaJson.format({ ...obj, TagArray: obj.Tags }, { spaces: 0, eol: '', singleQuote: true })
+  /**
+   * HACK
+   *
+   * - remove 'return' from beginning
+   * - remove dangling commas before closing } in tables
+   */
+  return t
+    .substring('return'.length)
+    .replace(/,}/g, '}')
 }
 
 async function trampoline (init) {
@@ -61,21 +75,16 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
   function createEval (line) {
     if (line === 'sample-gql') {
       console.log(chalk.blue('Initializing sample GraphQL Server at ao.server...'))
-      console.log(chalk.blue(`
-Example:
-
-ao.server('query GetPerson ($id: ID!) { person (id: $id) { firstName, lastName, age } }', { id = "id-2" })
-ao.server('query GetPersons { persons { firstName, lastName } }')
-`))
+      console.log(chalk.blue([
+        'Example:',
+        '',
+        'ao.server(\'query GetPerson ($id: ID!) { person (id: $id) { firstName, lastName, age } }\', { id = "id-2" })',
+        'ao.server(\'query GetPersons { persons { firstName, lastName } }\''
+      ].join('\n')))
       const init = readFileSync(join(__dirname, 'server.lua'), 'utf-8')
       line = `ao.server = ao.server or ${init}`
     } else if (line === 'gateway') {
       console.log(chalk.green('Initializing Arweave GraphQL Gatewway at ao.server...'))
-      console.log(chalk.green(`
-Example:
-
-ao.server('query { transaction (id: "540a3be5-dca2-47bf-97bc-27c754acc945") { id } }')
-`))
       const init = readFileSync(join(__dirname, 'gateway.lua'), 'utf-8')
       line = `local gql, apis = ${init}; ao.server = gql; ao.apis = apis;`
     } else if (line.startsWith('query') || line.startsWith('mutation')) {
@@ -94,7 +103,7 @@ ao.server('query { transaction (id: "540a3be5-dca2-47bf-97bc-27c754acc945") { id
       Module: env.Module.Id,
       Tags: [
         { name: 'Action', value: 'Eval' },
-        { name: 'Message-Count', value: ++messageCount }
+        { name: 'Message-Count', value: `${++messageCount}` }
       ],
       Data: line
     }
@@ -117,6 +126,11 @@ ao.server('query { transaction (id: "540a3be5-dca2-47bf-97bc-27c754acc945") { id
       'aos-graphql' + '> ',
       async function (line) {
         if (line === 'exit') return resolve()
+        if (line.startsWith('msg-')) {
+          console.log(toTable(createEval(line.substring('msg-'.length))))
+          // prompt for next input into repl
+          return resolve(() => repl(memory))
+        }
 
         try {
           const message = createEval(line)
