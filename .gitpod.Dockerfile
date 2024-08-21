@@ -18,6 +18,8 @@ RUN cd /workspace && \
   make build && \
   sudo make install
 
+RUN echo "trigger rebuild 1234"
+
 # Install ao dev-cli
 RUN curl -fsSL https://install_ao.g8way.io | bash
 RUN echo 'export AO_INSTALL=/home/gitpod/.ao' >> /home/gitpod/.bashrc.d/101-ao && \

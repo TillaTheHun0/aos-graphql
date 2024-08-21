@@ -11,6 +11,7 @@ This is a PoC for implementing the GraphQL Runtime in ao.
 <!-- toc -->
 
 - [Goals](#goals)
+- [Modules](#modules)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [How it works](#how-it-works)
@@ -22,6 +23,12 @@ This is a PoC for implementing the GraphQL Runtime in ao.
 ## Goals
 
 The goal is to demonstrate a functioning GraphQL server running inside an ao Process. This involves receive a GraphQL operation, parsing it, resolving it, then returning the result as a Lua table.
+
+## Modules
+
+- [`runtime`](./packages/runtime): the GraphQL runtime Lua implementation, with a parser written in C and accompanied Lua bindings.
+- [`server`](./packages/server): a GraphQL server Lua implementation, with OOTB integration with `aos` via it's `Handlers` API.
+- [`gateway`](./packages/gateway): a Arweave GraphQL Gateway Lua implementation, with OOTB integration with `aos` via it's `Handlers` API.
 
 ## Prerequisites
 
