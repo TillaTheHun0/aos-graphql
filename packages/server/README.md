@@ -20,7 +20,7 @@ A GraphQL Server implementation with OOTB integration with the [`aos` Handlers a
 Create a standalone GraphQL Server:
 
 ```lua
-local server = require('.graphql.server.init')
+local server = require('@tilla/graphql_server')
 
 -- Your graphql schema
 local schema = {...}

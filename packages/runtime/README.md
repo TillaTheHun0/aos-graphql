@@ -15,11 +15,11 @@ fantastic work so far on this implementation.
 ## Usage
 
 ```lua
-local parse = require('graphql.parse')
-local schema = require('graphql.schema')
-local types = require('graphql.types')
-local validate = require('graphql.validate')
-local execute = require('graphql.execute')
+local parse = require('@tilla/graphql.parse')
+local schema = require('@tilla/graphql.schema')
+local types = require('@tilla/graphql.types')
+local validate = require('@tilla/graphql.validate')
+local execute = require('@tilla/graphql.execute')
 
 -- Parse a query
 local ast = parse [[
