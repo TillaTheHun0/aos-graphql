@@ -1,5 +1,5 @@
 -- local ffi = require('ffi')
-local util = require('.graphql.util')
+local util = require('@tilla/graphql.util')
 local format = string.format
 
 local function error(...)

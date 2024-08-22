@@ -1,4 +1,4 @@
-local types = require('.graphql.types')
+local types = require('@tilla/graphql.types')
 
 local function typeFromAST(node, schema)
   local innerType

@@ -1,8 +1,10 @@
-local server = require('.graphql.server.init')
+local server = require('@tilla/graphql_server.init')
 
-local utils = require('.graphql.gateway.utils')
-local api = require('.graphql.gateway.api')
-local schema = require('.graphql.gateway.schema.init')
+local utils = require('@tilla/graphql_arweave_gateway.utils')
+local api = require('@tilla/graphql_arweave_gateway.api')
+local schema = require('@tilla/graphql_arweave_gateway.schema.init')
+
+local gateway = { _version = "0.0.1" }
 
 local function maybeRequire(moduleName)
   local ok, result, err = pcall(require, moduleName)
@@ -18,11 +20,10 @@ local function createServer (kind)
     local pType = args.persistence.type or 'sqlite_json'
 
     -- Create Data Access Layer
-    local ok, dal = maybeRequire('.graphql.gateway.dal.' .. pType .. '.init')
-    -- local ok, dal = true, require('.graphql.gateway.dal.sqlite_json.init')
+    local ok, dal = maybeRequire('@tilla/graphql_arweave_gateway.dal.' .. pType .. '.init')
     if ok then
       -- pass args.persistence as options to dal implementation
-      dal = dal(args.persistence)
+      dal = dal()(args.persistence)
     else
       assert(false, string.format('Persistence engine "%s" could not be loaded: %s', pType, tostring(dal)))
     end
@@ -68,7 +69,7 @@ local function createServer (kind)
   end
 end
 
-local create = createServer('create')
-local aos = createServer('aos')
+gateway.create = createServer('create')
+gateway.aos = createServer('aos')
 
-return { create = create, aos = aos }
+return gateway

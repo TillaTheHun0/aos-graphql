@@ -1,9 +1,14 @@
 (function ()
-  local graphql = require('.graphql.init')
+  -- START APM
+  require('.graphql.runtime')
+  require('.graphql.server')
+  -- END APM
+
+  local graphql = require('@tilla/graphql')
+  local server = require('@tilla/graphql_server')
 
   local schema, types = graphql.schema, graphql.types
 
-  local server = require('.graphql.server.init')
 
   local function reduce (fn, initial, t)
     assert(type(fn) == "function", "first argument should be a function that accepts (result, value, key)")

@@ -1,8 +1,8 @@
-local graphql = require('.graphql.init')
+local graphql = require('@tilla/graphql.init')
 
 local schema, types = graphql.schema, graphql.types
 
-local utils = require('.graphql.gateway.utils')
+local utils = require('@tilla/graphql_arweave_gateway.utils')
 
 -- Mini schemas that are used to build out the entire schema
 --[[
@@ -14,8 +14,8 @@ local utils = require('.graphql.gateway.utils')
 
  Once we figure out how indexers might receive sequential block
 ]]
-local Block = require('.graphql.gateway.schema.block')
-local Transaction = require('.graphql.gateway.schema.transaction')
+local Block = require('@tilla/graphql_arweave_gateway.schema.block')
+local Transaction = require('@tilla/graphql_arweave_gateway.schema.transaction')
 
 local function gatherQueryFields (minis)
   return utils.reduce(

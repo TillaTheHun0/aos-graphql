@@ -1,5 +1,5 @@
 
-local utils = require('.graphql.gateway.utils')
+local utils = require('@tilla/graphql_arweave_gateway.utils')
 
 local function createApis (args)
   local dal = args.dal

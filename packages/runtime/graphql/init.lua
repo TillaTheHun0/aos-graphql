@@ -1,12 +1,10 @@
-local path = (...):gsub('%.init$', '')
+local graphql = { _version = '0.0.1' }
 
-local graphql = {}
-
-graphql.parse = require(path .. '.parse')
-graphql.types = require(path .. '.types')
-graphql.schema = require(path .. '.schema')
-graphql.validate = require(path .. '.validate')
-graphql.execute = require(path .. '.execute')
-graphql.version = require(path .. '.version')
+graphql.parse = require('@tilla/graphql.parse')
+graphql.types = require('@tilla/graphql.types')
+graphql.schema = require('@tilla/graphql.schema')
+graphql.validate = require('@tilla/graphql.validate')
+graphql.execute = require('@tilla/graphql.execute')
+graphql.version = require('@tilla/graphql.version')
 
 return graphql

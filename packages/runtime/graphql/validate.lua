@@ -1,6 +1,6 @@
-local introspection = require('.graphql.introspection')
-local rules = require('.graphql.rules')
-local util = require('.graphql.util')
+local introspection = require('@tilla/graphql.introspection')
+local rules = require('@tilla/graphql.rules')
+local util = require('@tilla/graphql.util')
 
 local function getParentField(context, name, count)
   if introspection.fieldMap[name] then return introspection.fieldMap[name] end

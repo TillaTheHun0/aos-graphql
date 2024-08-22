@@ -1,8 +1,8 @@
-local graphql = require('.graphql.init')
+local graphql = require('@tilla/graphql.init')
 
-local utils = require('.graphql.gateway.utils')
-local connection = require('.graphql.gateway.schema.connection')
-local SortOrderSchema = require('.graphql.gateway.schema.sort_order')
+local utils = require('@tilla/graphql_arweave_gateway.utils')
+local connection = require('@tilla/graphql_arweave_gateway.schema.connection')
+local SortOrderSchema = require('@tilla/graphql_arweave_gateway.schema.sort_order')
 
 local types = graphql.types
 local ConnectionType, toConnection = connection.ConnectionType, connection.toConnection

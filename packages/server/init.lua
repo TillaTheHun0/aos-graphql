@@ -1,4 +1,4 @@
-local graphql = require('.graphql.init')
+local graphql = require('@tilla/graphql.init')
 
 local parse = graphql.parse
 local validate = graphql.validate

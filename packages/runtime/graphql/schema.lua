@@ -1,5 +1,5 @@
-local introspection = require('.graphql.introspection')
-local types = require('.graphql.types')
+local introspection = require('@tilla/graphql.introspection')
+local types = require('@tilla/graphql.types')
 
 local function error(...)
   return _G.error(..., 0)

@@ -1,8 +1,8 @@
-local introspection = require('.graphql.introspection')
-local query_util = require('.graphql.query_util')
-local types = require('.graphql.types')
-local util = require('.graphql.util')
-local validate_variables = require('.graphql.validate_variables')
+local introspection = require('@tilla/graphql.introspection')
+local query_util = require('@tilla/graphql.query_util')
+local types = require('@tilla/graphql.types')
+local util = require('@tilla/graphql.util')
+local validate_variables = require('@tilla/graphql.validate_variables')
 
 local function error(...)
   return _G.error(..., 0)

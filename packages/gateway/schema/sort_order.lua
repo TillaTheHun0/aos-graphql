@@ -1,4 +1,4 @@
-local graphql = require('.graphql.init')
+local graphql = require('@tilla/graphql.init')
 
 local types = graphql.types
 

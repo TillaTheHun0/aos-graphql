@@ -1,5 +1,5 @@
-local types = require('.graphql.types')
-local util = require('.graphql.util')
+local types = require('@tilla/graphql.types')
+local util = require('@tilla/graphql.util')
 local check = util.check
 
 local function error(...)

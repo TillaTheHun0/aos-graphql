@@ -1,6 +1,6 @@
-local graphql = require('.graphql.init')
+local graphql = require('@tilla/graphql.init')
 
-local utils = require('.graphql.gateway.utils')
+local utils = require('@tilla/graphql_arweave_gateway.utils')
 
 local types = graphql.types
 

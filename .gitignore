@@ -2,3 +2,4 @@ node_modules
 wallet.json
 build
 process.wasm
+bundle.lua
