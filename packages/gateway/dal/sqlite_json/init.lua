@@ -36,7 +36,7 @@ local function create ()
       tags TEXT,
       block TEXT,
       bundle_id TEXT,
-      target TEXT,
+      recipient TEXT,
       timestamp INTEGER
     ) WITHOUT ROWID;
   ]]
@@ -68,7 +68,7 @@ local function create ()
         and json.decode(row.block)
         or {},
       bundleId = row.bundle_id,
-      target = row.target
+      recipient = row.recipient
     }
 
     return doc
@@ -164,7 +164,7 @@ local function create ()
       { 'tags', maybeJson },
       { 'block', maybeJson },
       { 'bundle_id', utils.identity },
-      { 'target', utils.identity },
+      { 'recipient', utils.identity },
       { 'timestamp', utils.identity }
     }
     dal.saveTransaction = function (doc)

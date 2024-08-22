@@ -71,7 +71,7 @@ local function createApis (args)
         previous = nil
       },
       bundle_id = nil,
-      target = msg.Target,
+      recipient = msg.Target,
       timestamp = msg.Timestamp
     }
 
