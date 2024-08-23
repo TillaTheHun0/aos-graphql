@@ -25,7 +25,7 @@ local server = require('@tilla/graphql_server')
 -- Your graphql schema
 local schema = {...}
 
-local gql = server.create({ schema = schema })
+local gql = server.new({ schema = schema })
 
 local operation = [[
   query GetPerson ($id: ID!) {
@@ -36,7 +36,7 @@ local operation = [[
   }
 ]]
 
-local result = gql(operation, { id = "id-1" })
+local result = gql:resolve(operation, { id = "id-1" })
 --[[
 {
    person = {
@@ -83,7 +83,7 @@ local schema = {...}
 local gql = server.aos({ schema = schema })
 
 -- You can still send operations directly to your server returned
-local result = gql(
+local result = gql:resolve(
 [[
   query GetPerson ($id: ID!) {
     person (id: $id) {
@@ -115,7 +115,7 @@ When creating a server, in addition to providing `schema`, you can also provide 
 -- Some api
 function findPerson (id) ... end
 
-local gql = server.create({
+local gql = server.new({
   schema = schema,
   context = function (info)
     local contextValue = { findPerson = findPerson, userId = info.userId }
@@ -123,7 +123,7 @@ local gql = server.create({
   end
 })
 
-local result = gql(
+local result = gql:resolve(
 [[
   query GetPerson ($id: ID!) {
     person (id: $id) {
@@ -143,5 +143,5 @@ function PersonQueryResolver (_, arguments, contextValue)
 end
 ```
 
-- When using `server.create`, `info` provided to `context` will be the 3rd argument provided to the server function
+- When using `server.new`, `info` provided to `context` will be the 3rd argument provided to the server function
 - When using `server.aos`, `info` provided to `context` will be a table containing `{ msg, ao }` for the current message being evaluated

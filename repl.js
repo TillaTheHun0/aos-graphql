@@ -73,22 +73,28 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
   }
 
   function createEval (line) {
+    let Action = 'Eval'
+    const tags = [
+      { name: 'Message-Count', value: `${++messageCount}` }
+    ]
+
     if (line === 'sample-gql') {
-      console.log(chalk.blue('Initializing sample GraphQL Server at ao.server...'))
+      console.log(chalk.blue('Initializing sample GraphQL Server...'))
       console.log(chalk.blue([
         'Example:',
         '',
-        'ao.server(\'query GetPerson ($id: ID!) { person (id: $id) { firstName, lastName, age } }\', { id = "id-2" })',
-        'ao.server(\'query GetPersons { persons { firstName, lastName } }\''
+        'Gql:resolve(\'query GetPerson ($id: ID!) { person (id: $id) { firstName, lastName, age } }\', { id = "id-2" })',
+        'Gql:resolve(\'query GetPersons { persons { firstName, lastName } }\''
       ].join('\n')))
       const init = readFileSync(join(__dirname, 'server.lua'), 'utf-8')
-      line = `ao.server = ao.server or ${init}`
+      line = init
     } else if (line === 'gateway') {
-      console.log(chalk.green('Initializing Arweave GraphQL Gatewway at ao.server...'))
+      console.log(chalk.green('Initializing Arweave GraphQL Gateway...'))
       const init = readFileSync(join(__dirname, 'gateway.lua'), 'utf-8')
-      line = `local gql, apis = ${init}; ao.server = gql; ao.apis = apis;`
+      line = init
     } else if (line.startsWith('query') || line.startsWith('mutation')) {
-      line = `return ao.server('${line}')`
+      Action = 'GraphQL.Operation'
+      tags.push({ name: 'Operation', value: line })
     }
 
     const id = randomUUID()
@@ -102,8 +108,8 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
       'Block-Height': randomInt(1_000_000, 1_500_000),
       Module: env.Module.Id,
       Tags: [
-        { name: 'Action', value: 'Eval' },
-        { name: 'Message-Count', value: `${++messageCount}` }
+        { name: 'Action', value: Action },
+        ...tags
       ],
       Data: line
     }

@@ -4,46 +4,44 @@ local parse = graphql.parse
 local validate = graphql.validate
 local execute = graphql.execute
 
-local server = { version = '0.0.1' }
+local Server = {
+  version = '0.0.1',
+  constants = {
+    aos = {
+      ServerHandler = 'GraphQL.Server',
+      MessageAction = 'GraphQL.Operation'
+    }
+  }
+}
+Server.__index = Server
 
-server.create = function (args)
-  local schema, _context = args.schema, args.context or function () return {} end
+Server.new = function (args)
+  local self = setmetatable({}, Server)
+  self.schema = args.schema
+  self.context = args.context or function () return {} end
 
-  return function (operation, variables, info)
-    local contextValue = _context(info)
-
-    local ast = parse(operation)
-
-    -- Validate a parsed operation against the schema
-    validate(schema, ast)
-
-    local rootValue = nil
-    -- TODO: Does this lock down the operation to specific named operations?
-    -- TODO: derive from ast
-    local operationName = nil
-
-    local result = execute(schema, ast, rootValue, contextValue, variables, operationName)
-    return result
-  end
+  return self
 end
 
-server.aos = function (args)
-  local schema, context = args.schema, args.context
+--[[
+  Construct a graphql server, and prepend an aos Handler
+  to handle GraphQL operation messages
+]]
+Server.aos = function (args)
+  args.context = args.context or function (c) return c or {} end
 
-  local gql = server.create({
-    schema = schema,
-    -- Build a context value to pass to each invoked resolver
-    -- passing along the ao specific info
+  local gql = Server.new({
+    schema = args.schema,
     context = function (info)
-      local contextValue = context({ msg = info.msg, ao = info.ao })
+      info = info or {}
+      local contextValue = args.context({ msg = info.msg, ao = info.ao })
       return contextValue
     end
   })
 
-  -- Add an aos Handler that will handle any GraphQL actions
   Handlers.prepend(
-    "graphql",
-    function (msg) return msg.Tags.Action == 'GraphQL' end,
+    gql.constants.aos.ServerHandler,
+    function (msg) return msg.Tags.Action == gql.constants.aos.MessageAction end,
     function (msg)
       local operation, variables
       if msg.Tags.Operation then
@@ -53,7 +51,9 @@ server.aos = function (args)
         operation = msg.Data
       end
 
-      local result = gql(operation, variables or {}, { msg = msg, ao = ao })
+      variables = variables or {}
+      local info = { msg = msg, ao = ao }
+      local result = gql:resolve(operation, variables, info)
 
       ao.send({ Target = msg.From, Data = result })
       -- TODO: should we continue handler invocation?
@@ -65,4 +65,25 @@ server.aos = function (args)
   return gql
 end
 
-return server
+function Server:validate (operation)
+  local ast = parse(operation)
+  validate(self.schema, ast)
+  return ast
+end
+
+function Server:resolve (operation, variables, info)
+  local contextValue = self.context(info)
+
+  -- Validate a parsed operation against the schema
+  local ast = self:validate(operation)
+
+  local rootValue = nil
+  -- TODO: Does this lock down the operation to specific named operations?
+  -- TODO: derive from ast
+  local operationName = nil
+
+  local result = execute(self.schema, ast, rootValue, contextValue, variables, operationName)
+  return result
+end
+
+return Server

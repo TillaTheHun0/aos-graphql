@@ -46,20 +46,18 @@ local function createServer (kind)
       that will save all messages that are not crons to the indexer
     ]]
     if kind == 'aos' then
-      Handlers.after('graphql').add(
-        'saveTransaction',
+      Handlers.after(gql.constants.aos.ServerHandler).add(
+        'GraphQL.Arweave_Gateway',
         function (msg)
           if msg.Cron then return false end
-
-          -- keep flowing through subsequent handlers
-          if args.continue then return 'continue' end
-
-          -- stop handler flow after this one executes
+          -- Execute this handler, then keep flowing into subsequent handlers
+          if args.debug then return 'continue' end
+          -- Execute this handler, then stop
           return true
         end,
         function (msg)
           apis.saveTransaction(msg)
-          print(string.format('Saved msg "%s". You may query it from the graph', msg.Id))
+          print(string.format('Saved msg "%s"', msg.Id))
         end
       )
     end
@@ -69,7 +67,7 @@ local function createServer (kind)
   end
 end
 
-gateway.create = createServer('create')
+gateway.new = createServer('new')
 gateway.aos = createServer('aos')
 
 return gateway

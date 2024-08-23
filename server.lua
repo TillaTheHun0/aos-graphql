@@ -116,10 +116,8 @@
     })
   })
 
-  local gql = server.create({
+  Gql = server.aos({
     schema = Schema,
     context = function () return { db = db, dbById = dbById } end
   })
-
-  return gql
 end)()
