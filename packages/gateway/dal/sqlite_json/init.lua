@@ -5,7 +5,10 @@ local function create ()
 
   local utils = require('@tilla/graphql_arweave_gateway.utils')
 
-  local isNotEmpty = utils.complement(utils.isEmpty)
+  -- not nil and not empty
+  local isNotNempty = function (v)
+    return not (v == nil or utils.isEmpty(v))
+  end
 
   --[[
     A simple, single-table schema, for storing transactions.
@@ -14,6 +17,8 @@ local function create ()
   ]]
 
   local created = false
+  local DONE = sqlite3.DONE
+  local ROW = sqlite3.ROW
 
   --[[
     A simple, single-table schema, for storing transactions.
@@ -74,15 +79,12 @@ local function create ()
     return doc
   end
 
-  return function (args)
-    local DONE = sqlite3.DONE
-    local ROW = sqlite3.ROW
-    local client = args.client or sqlite3.open_memory()
+  local function toParameters (count)
+    return string.rep('?', count, ',')
+  end
 
-    -- Bootstrap the schema
-    createSchema(client)
-
-    local function query (input)
+  local function queryWith (client)
+    return function (input)
       local sql, params = input.sql, input.params
 
       local stmt = client:prepare(sql)
@@ -102,8 +104,10 @@ local function create ()
       stmt:finalize()
       return results
     end
+  end
 
-    local function run (input)
+  local function runWith (client)
+    return function (input)
       local sql, params = input.sql, input.params
 
       local stmt = client:prepare(sql)
@@ -115,6 +119,16 @@ local function create ()
 
       stmt:finalize()
     end
+  end
+
+  return function (args)
+    local client = args.client or sqlite3.open_memory()
+
+    -- Bootstrap the schema
+    createSchema(client)
+
+    local doQuery = queryWith(client)
+    local doRun = runWith(client)
 
     local dal = {}
 
@@ -131,23 +145,109 @@ local function create ()
         TODO: only select specific rows that we need
         to map
       ]]
-      local row = query({ sql = sql, params = params })
+      local row = doQuery({ sql = sql, params = params })
 
       return (row and #row > 0 and toDoc(row[1])) or nil
     end
 
     dal.findTransactions = function (criteria)
-      local sql = {
-        'SELECT * FROM transactions t'
-      }
+      criteria = criteria or {}
+      local query = {'SELECT * FROM transactions t'}
+      local wheres = {}
       local params = {}
 
-      if (criteria and isNotEmpty(criteria)) then
-        table.insert(sql, 'WHERE')
-        -- TODO: build out criteria
+      -- ids
+      if isNotNempty(criteria.ids) then
+        table.insert(wheres, string.format('t.id IN (%s)', toParameters(#criteria.ids)))
+        utils.mutConcat(params, criteria.ids)
       end
 
-      local rows = query({ sql = sql, params = params })
+      -- owners
+      if isNotNempty(criteria.owners) then
+        table.insert(
+          wheres,
+          string.format("json_extract(t.owner, '$.address') IN (%s)", toParameters(#criteria.owners))
+        )
+        utils.mutConcat(params, criteria.owners)
+      end
+
+      -- recipients
+      if isNotNempty(criteria.recipients) then
+        table.insert(wheres, string.format('t.recipient IN (%s)', toParameters(#criteria.recipients)))
+        utils.mutConcat(params, criteria.recipients)
+      end
+
+      -- tags
+      if isNotNempty(criteria.tags) then
+        for _, tag in ipairs(criteria.tags) do
+          table.insert(
+            wheres,
+            string.format(
+              "EXISTS (SELECT 1 FROM json_each(t.tags) WHERE json_each.value->>'$.name' = ? AND json_each.value->>'$.value' %sIN (%s))",
+              tag.op == 'NEQ' and 'NOT ' or '',
+              toParameters(#tag.values)
+            )
+          )
+          table.insert(params, tag.name)
+          utils.mutConcat(params, tag.values)
+        end
+      end
+
+      -- bundleIn
+      if isNotNempty(criteria.bundledIn) then
+        table.insert(wheres, string.format('t.bundle_id IN (%s)', toParameters(#criteria.bundledIn)))
+      end
+
+      -- block
+      if isNotNempty(criteria.block) then
+        local block = criteria.block
+        if block.min and block.max then
+          table.insert(
+            wheres,
+            "json_extract(block, '$.height') >= ? AND json_extract(block, '$.height') <= ?"
+          )
+          utils.mutConcat(params, { block.min, block.max })
+        elseif block.min then
+          table.insert(wheres, "json_extract(block, \'$.height\') >= ?")
+          table.insert(params, block.min)
+        elseif block.max then
+          table.insert(wheres, "json_extract(block, \'$.height\') <= ?")
+          table.insert(params, block.max)
+        end
+      end
+
+      -- Construct the where clause
+      if #wheres > 0 then
+        table.insert(query, string.format('WHERE %s', table.concat(wheres, ' AND ')))
+      end
+
+      -- Construct the order by clause
+      if criteria.sort then
+        local orderBy = string.format(
+          "json_extract(t.block, '$.height') %s",
+          criteria.sort == 'asc' and 'ASC' or 'DESC'
+        )
+        table.insert(query, string.format('ORDER BY %s', orderBy))
+      end
+
+      -- Construct the limit clause
+      if criteria.limit then
+        table.insert(query, string.format('LIMIT %d', criteria.limit))
+      end
+
+      -- Construct the offset clause
+      if criteria.after then
+        table.insert(
+          query,
+          string.format("OFFSET (SELECT COUNT(*) FROM transactions WHERE id <= '%s')", criteria.after)
+        )
+      end
+
+      -- construct the query
+      table.insert(query, ';')
+      local sql = table.concat(query, " ")
+
+      local rows = doQuery({ sql = sql, params = params })
 
       return utils.map(toDoc, rows)
     end
@@ -191,16 +291,16 @@ local function create ()
       end
 
       local sql = string.format(
-        [[
-          INSERT INTO transactions (%s)
-          VALUES (%s)
-          ON CONFLICT DO NOTHING;
-        ]],
+        table.concat({
+          "INSERT INTO transactions (%s)",
+          "VALUES (%s)",
+          "ON CONFLICT DO NOTHING;"
+        }, ' '),
         table.concat(cols, ', '),
         table.concat(values, ', ')
       )
 
-      local res = run({ sql = sql, params = params })
+      local res = doRun({ sql = sql, params = params })
 
       return res
     end

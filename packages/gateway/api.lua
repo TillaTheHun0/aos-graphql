@@ -26,6 +26,7 @@ local function createApis (args)
     --[[
       default is 10
       max is 1000
+      min is 1
     ]]
     local limit = utils.clamp(1, 1000, criteria.limit or 10)
     local nextIdx = limit + 1
@@ -39,11 +40,15 @@ local function createApis (args)
       { limit = nextIdx }
     }))
 
-    -- TODO: add any BL to map persistence model
+    -- The result set is smaller than the requested limit, so there is no next
+    if #transactions <= limit then return transactions, nil end
 
-    local nextTransaction = transactions[nextIdx]
+    -- split between result set and next
+    local results, _next = {}, nil
+    for i = 1, limit do table.insert(results, transactions[i]) end
+    _next = transactions[nextIdx]
 
-    return transactions, nextTransaction
+    return results, _next
   end
 
   --[[

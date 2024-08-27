@@ -214,11 +214,18 @@ local TransactionQuery = {
 
 
 local toTransactionConnection = toConnection({
-  -- TODO: make more opaque
+  --[[
+    TODO: What should we include in the cursor here?
+    all of the search criteria, plus the id?
+
+    For now just using id, but may need something more opaque
+    and encapsulates more info ie. the accompanying criteria
+    for the result set
+  ]]
   toCursor = function (args)
-    local transaction, criteria = args.transaction, args.criteria
-    -- TODO:how to implement
-    return transaction.id .. ',' .. criteria.sort
+    local transaction = args.node
+
+    return transaction.id
   end
 })
 
@@ -276,14 +283,17 @@ local TransactionsQuery = {
   resolve = function (_, arguments, ctx)
     local findTransactions = ctx.findTransactions
 
-    local limit = arguments.first
+    local limit = utils.clamp(1, 1000, arguments.first or 10)
 
-    local sort = arguments.sort == SortOrderEnum.values.HEIGHT_DESC.value
-      and 'desc'
-      or 'asc'
+    local after = arguments.after
 
-    local minHeight = arguments.block and arguments.block.min or nil
-    local maxHeight = arguments.block and arguments.block.max or nil
+    local sort = arguments.sort == SortOrderEnum.values.HEIGHT_ASC.value
+      and 'asc'
+      or 'desc'
+
+    local block = arguments.block
+      and { min = arguments.block.min, max = arguments.block.max }
+      or {}
 
     local bundledIn = arguments.bundledIn
       and arguments.bundledIn
@@ -291,20 +301,23 @@ local TransactionsQuery = {
 
     local tags = arguments.tags or {}
 
-    local transactions, nextTransaction = findTransactions({
+    local criteria = {
       ids = arguments.ids,
       recipients = arguments.recipients,
       owners = arguments.owners,
-      minHeight = minHeight,
-      maxHeight = maxHeight,
+      block = block,
       bundledIn = bundledIn,
       tags = tags,
       limit = limit,
-      sort = sort
-    })
+      sort = sort,
+      after = after
+    }
+
+    local transactions, nextTransaction = findTransactions(criteria)
 
     return toTransactionConnection({
       nodes = transactions,
+      criteria = criteria,
       next = nextTransaction,
       pageSize = limit
     })

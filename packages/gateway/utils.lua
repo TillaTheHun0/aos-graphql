@@ -75,7 +75,7 @@ utils.clamp = utils.curry(function (min, max, v)
   assert(type(min) == 'number', 'min must be a number')
   assert(type(max) == 'number', 'max must be a number')
   assert(type(v) == 'number', 'v must be a number')
-  assert(min > max, "min just not be greater than max")
+  assert(min <= max, "min must not be greater than max")
 
   return (v < min and min) or (v > max and max) or v
 end, 3)
@@ -88,6 +88,11 @@ utils.isEmpty = function (t) return next(t) == nil end
 
 utils.complement = function (fn)
   return function (...) return not fn(...) end
+end
+
+utils.mutConcat = function (t1, t2)
+  for i = 1, #t2 do table.insert(t1, t2[i]) end
+  return t1
 end
 
 return utils

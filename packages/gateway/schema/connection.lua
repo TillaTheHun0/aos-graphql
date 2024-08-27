@@ -48,10 +48,11 @@ end
 
 local function toConnection(builders)
   local toCursor = builders.toCursor
-  local toNode = builders.toNode or identity
+  local toNode = builders.toNode or function (args) return args.node end
 
   return function(input)
     local nodes = input.nodes
+    local criteria = input.criteria or {}
     local hasNextPage = input.next and true
     local pageSize = input.pageSize
 
@@ -62,10 +63,16 @@ local function toConnection(builders)
 
     -- Create edges
     local edges = {}
-    local count = 0
-    for i, node in ipairs(nodes) do
-      if count >= pageSize then break end
-      table.insert(edges, { node = toNode(node), cursor = toCursor(node) })
+    local count = 1
+    for idx, node in ipairs(nodes) do
+      if count > pageSize then break end
+      table.insert(
+        edges,
+        {
+          node = toNode({ node = node, criteria = criteria, idx = idx }),
+          cursor = toCursor({ node = node, criteria = criteria, idx = idx })
+        }
+      )
       count = count + 1
     end
 

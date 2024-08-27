@@ -37,11 +37,18 @@ local BlockQuery = {
 }
 
 local toBlockConnection = toConnection({
-  -- TODO: make more opaque
+  --[[
+    TODO: What should we include in the cursor here?
+    all of the search criteria, plus the id?
+
+    For now just using id, but may need something more opaque
+    and encapsulates more info ie. the accompanying criteria
+    for the result set
+  ]]
   toCursor = function (args)
-    local block, criteria = args.block, args.criteria
-    -- "1485116,HEIGHT_DESC"
-    return tostring(block.height) .. ',' .. criteria.sort
+    local block = args.node
+    -- "1485116"
+    return tostring(block.height)
   end
 })
 
@@ -84,15 +91,18 @@ local BlocksQuery = {
 
     local limit = utils.clamp(1, 1000, arguments.first or 10)
 
-    local blocks, nextBlock = findBlocks({
+    local criteria = {
       ids = arguments.ids,
       height = arguments.height,
       limit = limit,
       sort = sort
-    })
+    }
+
+    local blocks, nextBlock = findBlocks(criteria)
 
     return toBlockConnection({
       nodes = blocks,
+      criteria = criteria,
       next = nextBlock,
       pageSize = limit
     })
