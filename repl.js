@@ -93,12 +93,14 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
       const init = readFileSync(join(__dirname, 'gateway.lua'), 'utf-8')
       line = init
     } else if (line.startsWith('query') || line.startsWith('mutation')) {
+      const [operation, variables] = line.split('|').map(l => l.trim())
       Action = 'GraphQL.Operation'
-      tags.push({ name: 'Operation', value: line })
+      tags.push({ name: 'Content-Type', value: 'application/json' })
+      tags.push({ name: 'Operation', value: operation })
+      line = variables ? JSON.stringify(JSON.parse(variables)) : '1234'
     }
 
     const id = randomUUID()
-    console.log(`Sending msg: ${chalk.bgBlue(id)}`)
 
     return {
       Id: id,
@@ -140,9 +142,10 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
 
         try {
           const message = createEval(line)
-          const { Memory, Output, Error } = await handle(memory, message, env)
+          const { Memory, Messages, Output, Error } = await handle(memory, message, env)
           if (Error) console.error(Error)
           if (Output?.data) console.log(Output?.data)
+          if (Messages && Messages.length) Messages.forEach((m) => console.log(m))
           // prompt for next input into repl
           return resolve(() => repl(Memory))
         } catch (err) {

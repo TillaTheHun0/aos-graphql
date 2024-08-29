@@ -7,5 +7,5 @@
 
   local gateway = require('@tilla/graphql_arweave_gateway')
 
-  Gql, Apis = gateway.aos({ debug = true })
+  Gateway = gateway.aos({ continue = true })
 end)()

@@ -51,14 +51,12 @@ Server.aos = function (args)
         operation = msg.Data
       end
 
-      variables = variables or {}
+      if type(variables) ~= 'table' then variables = {} end
+
       local info = { msg = msg, ao = ao }
       local result = gql:resolve(operation, variables, info)
 
       ao.send({ Target = msg.From, Data = result })
-      -- TODO: should we continue handler invocation?
-      -- break after handler is executed and a result in resolved
-      return -1
     end
   )
 
