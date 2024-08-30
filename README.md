@@ -1,10 +1,9 @@
 # aos-graphql
 
-> [!CAUTION]
-> **This is an experimental repo, and under active development**
+> [!CAUTION] **This is an experimental repo, and under active development**
 >
-> **As such, this repo may become out-of-date and may not work out-of-the-box, and no Tier 1 support from
-> the AO dev team is offered for this repository.**
+> **As such, this repo may become out-of-date and may not work out-of-the-box,
+> and no Tier 1 support from the AO dev team is offered for this repository.**
 
 This is a PoC for implementing the GraphQL Runtime in ao.
 
@@ -14,53 +13,56 @@ This is a PoC for implementing the GraphQL Runtime in ao.
 - [Modules](#modules)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-- [How it works](#how-it-works)
-- [Sample GraphQL](#sample-graphql)
+- [Repl Usage](#repl-usage)
 - [Known Outstanding Issues](#known-outstanding-issues)
 
 <!-- tocstop -->
 
 ## Goals
 
-The goal is to demonstrate a functioning GraphQL server running inside an ao Process. This involves receive a GraphQL operation, parsing it, resolving it, then returning the result as a Lua table.
+The goal is to demonstrate a functioning GraphQL runtime running inside an ao
+Process. This involves parsing a GraphQL operation, validating it against a
+schema, resolving it, then returning the result.
+
+Additionally, we'd like to build a simple GraphQL server that is able to accept
+an operation and then resolve it using the GraphQL runtime.
+
+Finally, we'd like to build a PoC of the Arweave GraphQL Gateway and an Indexer
+that can index incoming messages and then query against using the Arweave
+GraphQL Gateway API.
 
 ## Modules
 
-- [`runtime`](./packages/runtime): the GraphQL runtime Lua implementation, with a parser written in C and accompanied Lua bindings.
-- [`server`](./packages/server): a GraphQL server Lua implementation, with OOTB integration with `aos` via it's `Handlers` API.
-- [`gateway`](./packages/gateway): a Arweave GraphQL Gateway Lua implementation, with OOTB integration with `aos` via it's `Handlers` API.
+- [`runtime`](./packages/runtime): the GraphQL runtime Lua implementation, with
+  a parser written in C and accompanied Lua bindings.
+- [`server`](./packages/server): a GraphQL server Lua implementation, with OOTB
+  integration with `aos` via it's `Handlers` API.
+- [`gateway`](./packages/gateway): a Arweave GraphQL Gateway Lua implementation,
+  with OOTB integration with `aos` via it's `Handlers` API.
 
 ## Prerequisites
 
 - `ao` dev-cli `0.1.3`
-- `cmake` and `make` 
+- `cmake` and `make`
 - If running the `repl.js`, you'll need `NodeJS 22+` and `npm`
 
 ## Getting Started
 
-Initialize the `aos` submodule using `git submodule update --init`. You can update the submodule to latest by running `git submodule update --remote`.
+Initialize the `aos` submodule using `git submodule update --init`. You can
+update the submodule to latest by running `git submodule update --remote`.
 
-Then either use `cmake`, or if you have `npm`, simply run `npm run build` to produce the wasm with a built-in graphql runtime implementation
+Then either use `cmake`, or if you have `npm`, simply run `npm run build` to
+produce the wasm with a built-in graphql runtime implementation
 
 > If using the `repl.js` you'll need to also install dependencies using `npm i`
 
-## How it works
+## Repl Usage
 
-The Lua implementation of the GraphQL runtime is located in the `graphql` folder.
+You can `npm run dev` to start the repl with hot wasm reloading.
 
-The Lua implementation depends on a a [pure C implementation](./packages/runtime/parser/libgraphqlparser) of a GraphQL operation parser, `libgraphqlparser`, copied from [The GraphQL foundation here](https://github.com/graphql/libgraphqlparser).
+Run `gateway` to configure a gateway for local development (see
+[gateway.lua](./gateway.lua))
 
-Lua requires bindings in order to invoke the C parser, which are implemented [here](./packages/runtime/parser/luagraphqlparser)
-
-When running the root `cmake`:
-
-- The C implementation is compiled into a static library (`.a`)
-- The Lua bindings are then compiled, along with the compiled C implementation into a static library `.a`
-- The Lua implementation of the GraphQL runtime, along with the `.a` are copied in `aos/process/graphql` and `aos/process/libs`
-- The `ao` dev-cli is used to build the aos process code into a `process.wasm`, which is then copied to the root of the repo, to be loaded by the `repl.js`, if desired.
-
-## Sample GraphQL
-
-A sample graphql server is implemented in `server.lua` and can be hotloaded via the `repl.js` using executing `sample-gql`
+Run `sample-gql` for a sample gql server (see [server.lua](./server.lua))
 
 ## Known Outstanding Issues

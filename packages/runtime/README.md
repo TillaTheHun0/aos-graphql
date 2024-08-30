@@ -1,18 +1,39 @@
-# lua-graphql
+# GraphQL Lua
 
 An Lua implementation of the GraphQL runtime.
 
 Originally forked from
-[this implementation](https://github.com/tarantool/graphql). Thank you for the
-fantastic work so far on this implementation.
+[this implementation](https://github.com/tarantool/graphql). Thank you to [bjornbytes](https://github.com/bjornbytes/graphql-lua) and the [tarantool team](https://github.com/tarantool/graphql) for the fantastic work on the runtime, up until this point.
 
 <!-- toc -->
 
+- [Prerequisites](#prerequisites)
 - [Usage](#usage)
 
 <!-- tocstop -->
 
+## Prerequisites
+
+When spinning up `aos`, you will need to specify the `ao` Module which includes
+the GraphQL parser and lua bindings.
+
+```sh
+aos --module="<need_module>"
+```
+
 ## Usage
+
+First, install the module using [APM](https://apm.betteridea.dev/):
+
+```sh
+APM.install("@tilla/graphql")
+```
+
+Once installation has finished, you can `require('@tilla/graphql')` in order to
+build your GraphQL types, schema, and execution.
+
+> If you would like a turnkey GraphQL Server, you can use
+> [`@tilla/graphql_server`](../server/), which has OOTB `aos` integration.
 
 ```lua
 local parse = require('@tilla/graphql.parse')
@@ -21,14 +42,18 @@ local types = require('@tilla/graphql.types')
 local validate = require('@tilla/graphql.validate')
 local execute = require('@tilla/graphql.execute')
 
--- Parse a query
-local ast = parse [[
-query getUser($id: ID) {
-  person(id: $id) {
-    firstName
-    lastName
-  }
-}
+--[[
+  First define your types and resolvers
+
+  Additional APIs:
+
+  types.long
+  types.list()
+  types.enum()
+  types.nonNull()
+  types.nullable()
+  types.scalar()
+  types.inputObject()
 ]]
 
 -- Create a type
@@ -51,7 +76,8 @@ local schema = schema.create({
       person = {
         kind = Person,
         arguments = {
-          id = types.id
+          id = types.id,
+          defaultValue = 1
         },
         resolve = function(rootValue, arguments, context, info)
           if arguments.id ~= 1 then return nil end
@@ -67,6 +93,20 @@ local schema = schema.create({
     }
   })
 })
+
+--[[
+  Now you can parse operations and execute your schema!
+]]
+
+-- Parse a query
+local ast = parse [[
+query getUser($id: ID) {
+  person(id: $id) {
+    firstName
+    lastName
+  }
+}
+]]
 
 -- Validate a parsed query against a schema
 validate(schema, ast)
