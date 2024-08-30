@@ -7,5 +7,7 @@
 
   local gateway = require('@tilla/graphql_arweave_gateway')
 
-  Gateway = gateway.aos({ continue = true })
+  Gateway = gateway.aos({
+    match = function (msg) return 'continue' end
+  })
 end)()

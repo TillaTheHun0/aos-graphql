@@ -113,6 +113,7 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
         { name: 'Action', value: Action },
         ...tags
       ],
+      Timestamp: new Date().getTime(),
       Data: line
     }
   }
