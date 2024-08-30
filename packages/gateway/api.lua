@@ -59,7 +59,7 @@ local function createApis (args)
     - block related metadata (timestamp, id, previous -- we _do_ have height)
   ]]
   apis.saveTransaction = function (msg)
-    local doc = {
+    local transaction = {
       id = msg.Id,
       anchor = msg.Anchor,
       signature = msg.Signature,
@@ -80,9 +80,9 @@ local function createApis (args)
       timestamp = msg.Timestamp
     }
 
-    dal.saveTransaction(doc)
+    dal.saveTransaction(transaction)
 
-    return doc
+    return transaction
   end
 
   return apis

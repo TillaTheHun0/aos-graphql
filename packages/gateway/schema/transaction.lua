@@ -1,4 +1,6 @@
 -- TODO: anyway to not require a module directly from aos?
+local json = require('json')
+local base64 = require('.base64')
 local bint = require('.bint')(256)
 
 local graphql = require('@tilla/graphql.init')
@@ -142,7 +144,7 @@ local Transaction = types.object({
     signature = {
       kind = types.string.nonNull,
       resolve = function (transaction)
-        -- TODO: does this need to take into account bundleId?
+        -- TODO: does this need to take into account bundle_id?
         -- See https://github.com/ar-io/ar-io-node/blob/f14a32ac6efe72cfb63e2e75ab50bd713adeeb04/src/routes/graphql/resolvers.ts#L86
         return transaction.signature or '<not-found>'
       end
@@ -181,7 +183,7 @@ local Transaction = types.object({
       kind = Parent,
       deprecationReason = 'Use `bundledIn`',
       resolve = function (transaction)
-        return transaction.bundleId and { id = transaction.bundleId } or nil
+        return transaction.bundle_id and { id = transaction.bundle_id } or nil
       end
     },
     bundledIn = {
@@ -192,7 +194,7 @@ local Transaction = types.object({
         See: https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md
       ]],
       resolve = function (transaction)
-        return transaction.bundleId and { id = transaction.bundleId } or nil
+        return transaction.bundle_id and { id = transaction.bundle_id } or nil
       end
     }
   }
@@ -225,7 +227,11 @@ local toTransactionConnection = toConnection({
   toCursor = function (args)
     local transaction = args.node
 
-    return transaction.id
+    return base64.encode(json.encode({
+      id = transaction.id,
+      timestamp = transaction.timestamp,
+      height = transaction.block.height
+    }))
   end
 })
 
@@ -286,6 +292,8 @@ local TransactionsQuery = {
     local limit = utils.clamp(1, 1000, arguments.first or 10)
 
     local after = arguments.after
+      and json.decode(base64.decode(arguments.after))
+      or nil
 
     local sort = arguments.sort == SortOrderEnum.values.HEIGHT_ASC.value
       and 'asc'

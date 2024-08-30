@@ -72,8 +72,9 @@ local function create ()
       block = row.block
         and json.decode(row.block)
         or {},
-      bundleId = row.bundle_id,
-      recipient = row.recipient
+      bundle_id = row.bundle_id,
+      recipient = row.recipient,
+      timestamp = row.timestamp
     }
 
     return doc
@@ -131,6 +132,10 @@ local function create ()
     local doRun = runWith(client)
 
     local dal = {}
+
+    dal.client = client
+    dal.query = doQuery
+    dal.run = doRun
 
     dal.findTransactionById = function (id)
       local sql = [[
@@ -216,6 +221,29 @@ local function create ()
         end
       end
 
+      --[[
+        Produce an offset
+
+        Since results are always ordered by block height asc or desc
+        we can offset within the result set using an additional where clause
+        w.r.t block height and timestamp
+
+        So use the after to determine the direction being traversed (asc, desc)
+        and which block to use
+      ]]
+      if isNotNempty(criteria.after) then
+        local height, timestamp = criteria.after.height, criteria.after.timestamp
+        table.insert(
+          wheres,
+          string.format(
+            "json_extract(block, \'$.height\') %s ? OR (json_extract(block, \'$.height\') = ? AND timestamp %s ?)",
+            criteria.sort == 'asc' and '>' or '<',
+            criteria.sort == 'asc' and '>' or '<'
+          )
+        )
+        utils.mutConcat(params, { height, height, timestamp })
+      end
+
       -- Construct the where clause
       if #wheres > 0 then
         table.insert(query, string.format('WHERE %s', table.concat(wheres, ' AND ')))
@@ -223,9 +251,15 @@ local function create ()
 
       -- Construct the order by clause
       if criteria.sort then
+        local order = criteria.sort == 'asc' and 'ASC' or 'DESC'
         local orderBy = string.format(
-          "json_extract(t.block, '$.height') %s",
-          criteria.sort == 'asc' and 'ASC' or 'DESC'
+          --[[
+            Always sort by block height first, but then by timestamp
+            so that results are predictably ordered in the results sets
+          ]]
+          "json_extract(t.block, '$.height') %s, timestamp %s",
+          order,
+          order
         )
         table.insert(query, string.format('ORDER BY %s', orderBy))
       end
@@ -233,14 +267,6 @@ local function create ()
       -- Construct the limit clause
       if criteria.limit then
         table.insert(query, string.format('LIMIT %d', criteria.limit))
-      end
-
-      -- Construct the offset clause
-      if criteria.after then
-        table.insert(
-          query,
-          string.format("OFFSET (SELECT COUNT(*) FROM transactions WHERE id <= '%s')", criteria.after)
-        )
       end
 
       -- construct the query

@@ -58,23 +58,31 @@ Gateway.aos = function (args)
   local self = Gateway.new(args)
 
   self.continue = args.continue or false
-  self.matchSpec = args.matchSpec or nil
+  self.match = args.match or nil
+
+  local function defaultMatch (msg)
+    if msg.Cron then return false end
+
+    -- Do not index Evals targeting this process
+    if msg.Action == 'Eval' and msg.Target == ao.id then
+      return false
+    end
+
+    -- Execute this handler, then keep flowing into subsequent handlers
+    if self.continue then return 'continue' end
+    -- Execute this handler, then stop
+    return true
+  end
 
   --[[
     Automatically attach an aos handler after the graphql handler
     that will save all messages that are not crons to the indexer
   ]]
   Handlers.after(self.gql.constants.aos.ServerHandler).add(
-    'GraphQL.Arweave_Gateway',
+    'GraphQL.Indexer',
     function (msg)
-      -- Use custom matchSpec
-      if self.matchSpec then return self.matchSpec(msg) end
-
-      if msg.Cron then return false end
-      -- Execute this handler, then keep flowing into subsequent handlers
-      if self.continue then return 'continue' end
-      -- Execute this handler, then stop
-      return true
+      if self.match then return self.match(msg) end
+      return defaultMatch(msg)
     end,
     function (msg)
       self.apis.saveTransaction(msg)
