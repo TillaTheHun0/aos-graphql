@@ -35,9 +35,12 @@ Gateway.new = function (args)
   -- Compose Business logic on top of data access layer
   local apis = api.createApis({ dal = dal })
 
-  -- Create the GraphQL Server
+  -- Expose apis
+  self.index = apis.saveTransaction
   self.apis = apis
   self.dal = dal
+
+  -- Create the GraphQL Server
   self.gql = server[self.kind]({
     continue = self.continue,
     schema = schema,
@@ -81,7 +84,7 @@ Gateway.aos = function (args)
   Handlers.after(self.gql.constants.aos.ServerHandler).add(
     'GraphQL.Indexer',
     function (msg)
-      if self.match then return self.match(msg) end
+      if self.match then return require('.utils').matchesSpec(msg, self.match) end
       return defaultMatch(msg)
     end,
     function (msg)
