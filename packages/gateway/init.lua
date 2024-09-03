@@ -12,6 +12,23 @@ local function maybeRequire(moduleName)
   else return ok, err end
 end
 
+local function parseCustomDal (impl)
+  local errs = {}
+
+  if type(impl) ~= "table" then table.insert(errs, "custom dal must be a table") end
+
+  impl = impl or {}
+  if type(impl.findTransactionById) ~= 'function' then table.insert(errs, "custom dal must implement findTransactionById(id)") end
+  if type(impl.findTransactions) ~= 'function' then table.insert(errs, "custom dal must implement findTransactions(criteria)") end
+  if type(impl.saveTransaction) ~= 'function' then table.insert(errs, "custom dal must implement saveTransaction(doc)") end
+
+  if #errs > 0 then assert(false, table.concat(errs, ',\n')) end
+
+  -- TODO: ought we wrap with some sort of schema validation?
+
+  return impl
+end
+
 Gateway.new = function (args)
   local self = setmetatable({}, Gateway)
 
@@ -19,17 +36,21 @@ Gateway.new = function (args)
   -- Kind defaults to 'new'
   self.kind = args.kind or 'new'
   self.continue = args.continue or false
-  self.persistence = args.persistence or {}
-  -- Persistence defaults to sqlite_json
-  self.persistence.type = self.persistence.type or 'sqlite_json'
+  self.dal = args.dal or {}
 
   -- Create Data Access Layer
-  local ok, dal = maybeRequire(string.format('@tilla/graphql_arweave_gateway.dal.%s.init', self.persistence.type))
-  if ok then
-    -- pass args.persistence as options to dal implementation
-    dal = dal()(self.persistence)
+  local dal = nil
+
+  -- The caller has provided a dal impl, so use that
+  if self.dal.impl then
+    dal = parseCustomDal(self.dal.impl)
+    self.dal.type = 'custom'
+  -- Use a pre-canned dal impl, defaulting to sqlite_json
   else
-    assert(false, string.format('Persistence engine "%s" could not be loaded: %s', self.persistence.type, tostring(dal)))
+    local ok, buildDal = maybeRequire(string.format('@tilla/graphql_arweave_gateway.dal.%s.init', self.dal.type or 'sqlite_json'))
+    -- pass args.persistence as options to dal implementation
+    if ok then dal = buildDal()(self.dal)
+    else assert(false, string.format('Persistence engine "%s" could not be loaded: %s', self.dal.type, tostring(dal))) end
   end
 
   -- Compose Business logic on top of data access layer
