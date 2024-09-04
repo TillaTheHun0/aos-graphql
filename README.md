@@ -51,8 +51,9 @@ GraphQL Gateway API.
 Initialize the `aos` submodule using `git submodule update --init`. You can
 update the submodule to latest by running `git submodule update --remote`.
 
-Then either use `cmake`, or if you have `npm`, simply run `npm run build` to
-produce the wasm with a built-in graphql runtime implementation
+Then either use `cmake`, or if you have `npm`, simply run `npm run build:sandbox` to
+produce the wasm with a built-in graphql runtime, server, and gateway implementation,
+as well as SQLite bindings. The WASM produced can be used, turnkey, with the repl.
 
 > If using the `repl.js` you'll need to also install dependencies using `npm i`
 

@@ -11,7 +11,7 @@ tasks:
   - name: 🛠📊 Build & Start GraphQL Module
     init: |
       npm i
-      npm run build
+      npm run build:sandbox
     command: 
       npm start
 

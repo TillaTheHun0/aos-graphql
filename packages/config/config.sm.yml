@@ -1,0 +1,7 @@
+# 16mb
+'stack_size': 16777216
+# 32mb
+'initial_memory': 33554432
+# 1gb
+'maximum_memory': 1073741824
+ 

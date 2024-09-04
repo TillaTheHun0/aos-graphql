@@ -11,12 +11,8 @@ import AoLoader from '@permaweb/ao-loader'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-function binaryStream (USE_AOS) {
-  if (USE_AOS) {
-    console.log('Using aos base module...')
-    return fetch('https://arweave.net/raw/xT0ogTeagEGuySbKuUoo_NaWeeBv1fZ4MqgDdKVKY0U').then(res => res.body)
-  }
-  return Promise.resolve(Readable.toWeb(createReadStream('./process.wasm')))
+function binaryStream (WASM_FILE) {
+  return Promise.resolve(Readable.toWeb(createReadStream(WASM_FILE)))
 }
 
 function toTable (obj) {
@@ -168,7 +164,7 @@ replWith({
    * Assignable that allows all assignments
    */
   ASSIGNABLE: 'function (msg) return true end',
-  stream: await binaryStream(!!process.env.USE_AOS),
+  stream: await binaryStream(process.env.WASM_FILE || './process.wasm'),
   env: {
     Process: {
       Id: 'PROCESS_TEST',
