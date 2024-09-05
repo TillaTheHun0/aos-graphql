@@ -14,6 +14,7 @@ Gateway schema.
   - [Standalone Gateway](#standalone-gateway)
   - [Indexing](#indexing)
   - [`aos` Handlers](#aos-handlers)
+    - [Assignments](#assignments)
     - [Options](#options)
 - [Outstanding Issues](#outstanding-issues)
 
@@ -34,11 +35,18 @@ You will need to have the
 [Lua GraphQL Runtime Implementation available](../runtime) You will also need to
 have [Lua GraphQL Server Implementation available](../server/)
 
+You can install both using APM:
+
+```lua
+APM.install("@tilla/graphql")
+APM.install("@tilla/graphql_server")
+```
+
 ## Usage
 
 First, install using [APM](https://apm.betteridea.dev/):
 
-```sh
+```lua
 APM.install("@tilla/graphql_arweave_gateway")
 ```
 
@@ -97,8 +105,14 @@ that will handle `GraphQL.Operation` messages, a `GraphQL.Indexer` is added
 directly after `GraphQL.Server` that will index any messages that satisfy the
 `MatchSpec`.
 
-> Make sure to add the appropriate `assignables` to your `aos` process that will
-> configure it to accept expected assigned messages.
+#### Assignments
+
+If the process will be indexing `assignments` it receives, be sure to add the appropriate
+`assignables` `MatchSpec` to allow/deny the desired assignments:
+
+```lua
+ao.addAssignable('all', function (msg) return msg.Action == 'Index-Me' end)
+```
 
 #### Options
 

@@ -16,13 +16,19 @@ A GraphQL Server implementation with OOTB integration with the
 
 ## Prerequisites
 
-- The GraphQL runtime implementation [here](../runtime)
+The GraphQL runtime implementation [here](../runtime)
+
+You can install using APM:
+
+```lua
+APM.install("@tilla/graphql")
+```
 
 ## Usage
 
 First, install the module using [APM](https://apm.betteridea.dev/):
 
-```sh
+```lua
 APM.install("@tilla/graphql_server")
 ```
 

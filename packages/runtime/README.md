@@ -26,7 +26,7 @@ aos --module="_wjbCuCyUTmKAseOfEj0NzrCNUgKcMqBGaSzNySzMoY"
 
 First, install the module using [APM](https://apm.betteridea.dev/):
 
-```sh
+```lua
 APM.install("@tilla/graphql")
 ```
 
