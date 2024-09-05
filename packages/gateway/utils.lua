@@ -80,9 +80,9 @@ utils.clamp = utils.curry(function (min, max, v)
   return (v < min and min) or (v > max and max) or v
 end, 3)
 
-utils.startsWith = function (str, start)
+utils.startsWith = utils.curry(function (start, str)
   return string.sub(str, 1, string.len(start)) == start
-end
+end)
 
 utils.isEmpty = function (t) return next(t) == nil end
 

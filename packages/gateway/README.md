@@ -107,6 +107,7 @@ for determining whether or not to intercept and index the incoming message:
 
 - The message is not a `Cron` message
 - The message is not an `Eval` targeting this process
+- The message is not an `APM` message
 
 Alternatively, to customize the Indexing behavior, you may provide a custom
 `MatchSpec`, so as to only index messages that satisy the provided `MatchSpec`:

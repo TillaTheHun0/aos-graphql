@@ -4,7 +4,7 @@ local utils = require('@tilla/graphql_arweave_gateway.utils')
 local api = require('@tilla/graphql_arweave_gateway.api')
 local schema = require('@tilla/graphql_arweave_gateway.schema.init')
 
-local Gateway = { _version = "0.0.2" }
+local Gateway = { _version = "0.0.3" }
 
 local function maybeRequire(moduleName)
   local ok, result, err = pcall(require, moduleName)
@@ -92,6 +92,11 @@ Gateway.aos = function (args)
       return false
     end
 
+    -- Do not index msgs received as a result of APM operations
+    if utils.startsWith('APM.', msg.Action) then
+      return false
+    end
+
     -- Execute this handler, then keep flowing into subsequent handlers
     if self.continue then return 'continue' end
     -- Execute this handler, then stop
@@ -110,7 +115,7 @@ Gateway.aos = function (args)
     end,
     function (msg)
       self.apis.saveTransaction(msg)
-      print(string.format('Saved msg "%s"', msg.Id))
+      print(string.format('Indexed message "%s"', msg.Id))
     end
   )
 
