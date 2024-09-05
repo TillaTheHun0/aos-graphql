@@ -5,7 +5,7 @@ local validate = graphql.validate
 local execute = graphql.execute
 
 local Server = {
-  version = '0.0.1',
+  _version = '0.0.2',
   constants = {
     aos = {
       ServerHandler = 'GraphQL.Server',

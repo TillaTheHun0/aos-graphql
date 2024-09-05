@@ -30,7 +30,7 @@ First, install the module using [APM](https://apm.betteridea.dev/):
 APM.install("@tilla/graphql")
 ```
 
-Once installation has finished, you can `require('@tilla/graphql')` in order to
+Once installation has finished, you can `require('@tilla/graphql.init')` in order to
 build your GraphQL types, schema, and execution.
 
 > If you would like a turnkey GraphQL Server, you can use

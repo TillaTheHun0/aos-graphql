@@ -43,7 +43,7 @@ APM.install("@tilla/graphql_arweave_gateway")
 ```
 
 Once installation has finished, you can
-`require("@tilla/graphql_arweave_gateway")` in order to create your Arweave
+`require("@tilla/graphql_arweave_gateway.init")` in order to create your Arweave
 Gateway.
 
 ### Standalone Gateway
@@ -51,7 +51,7 @@ Gateway.
 You can create a standalone Arweave GraphQL Indexer+Gateway:
 
 ```lua
-Gateway = require('@tilla/graphql_arweave_gateway').new()
+Gateway = require('@tilla/graphql_arweave_gateway.init').new()
 
 -- save a transaction to be indexed
 Gateway.saveTransaction(msg)
@@ -89,7 +89,7 @@ implementing indexing using other types of persistence.
 This implementation has OOTB support for `aos` and its `Handlers` api:
 
 ```lua
-Gateway = require('@tilla/graphql_arweave_gateway').aos()
+Gateway = require('@tilla/graphql_arweave_gateway.init').aos()
 ```
 
 In addition to the [`GraphQL.Server` Handler](../server/README.md#aos-handler)
@@ -112,7 +112,7 @@ Alternatively, to customize the Indexing behavior, you may provide a custom
 `MatchSpec`, so as to only index messages that satisy the provided `MatchSpec`:
 
 ```lua
-Gateway = require('@tilla/graphql_arweave_gateway').aos({
+Gateway = require('@tilla/graphql_arweave_gateway.init').aos({
   match = function (msg) return msg.Action === 'Index-Me' end
 })
 ```
@@ -123,7 +123,7 @@ short-hand option, `continue`, to inform the `Indexer` to continue handler
 execution after Indexing is complete:
 
 ```lua
-Gateway = require('@tilla/graphql_arweave_gateway').aos({ continue = true })
+Gateway = require('@tilla/graphql_arweave_gateway.init').aos({ continue = true })
 ```
 
 ## Outstanding Issues

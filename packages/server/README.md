@@ -26,7 +26,7 @@ First, install the module using [APM](https://apm.betteridea.dev/):
 APM.install("@tilla/graphql_server")
 ```
 
-Once installation has finished, you can `require('@tilla/graphql_server')` in
+Once installation has finished, you can `require('@tilla/graphql_server.init')` in
 order to create your GraphQL Server to server your `schema`.
 
 ### Standalone Server
@@ -34,7 +34,7 @@ order to create your GraphQL Server to server your `schema`.
 You can create a standalone GraphQL Server:
 
 ```lua
-local GraphQLServer = require('@tilla/graphql_server')
+local GraphQLServer = require('@tilla/graphql_server.init')
 
 -- Your graphql schema
 local schema = {...}
@@ -72,7 +72,7 @@ This GraphQL Server has OOTB support for `aos` and its `Handlers` api:
 -- Your graphql schema
 local schema = {...}
 
-local gql = require('.graphql.server.init').aos({ schema = schema })
+local gql = require('@tilla/graphql_server.init').aos({ schema = schema })
 ```
 
 This will add an `aos` handler named `GraphQL.Server` that will handle any

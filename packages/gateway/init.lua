@@ -4,7 +4,7 @@ local utils = require('@tilla/graphql_arweave_gateway.utils')
 local api = require('@tilla/graphql_arweave_gateway.api')
 local schema = require('@tilla/graphql_arweave_gateway.schema.init')
 
-local Gateway = { _version = "0.0.1" }
+local Gateway = { _version = "0.0.2" }
 
 local function maybeRequire(moduleName)
   local ok, result, err = pcall(require, moduleName)
