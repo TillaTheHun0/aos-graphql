@@ -18,7 +18,8 @@ When spinning up `aos`, you will need to specify the `ao` Module which includes
 the GraphQL parser and lua bindings.
 
 ```sh
-aos --module="<need_module>"
+# Spin up a aos-sqlite-graphql process with 1-gb memory limit
+aos --module="_wjbCuCyUTmKAseOfEj0NzrCNUgKcMqBGaSzNySzMoY"
 ```
 
 ## Usage

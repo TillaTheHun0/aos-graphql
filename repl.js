@@ -164,7 +164,7 @@ replWith({
    * Assignable that allows all assignments
    */
   ASSIGNABLE: 'function (msg) return true end',
-  stream: await binaryStream(process.env.WASM_FILE || './process.wasm'),
+  stream: await binaryStream(process.env.WASM_FILE || './process.sandbox.wasm'),
   env: {
     Process: {
       Id: 'PROCESS_TEST',

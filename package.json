@@ -5,13 +5,15 @@
   "type": "module",
   "main": "repl.js",
   "scripts": {
-    "build": "(mkdir -p build && cd build && cmake -DINCLUDE_SQLITE_SYMBOLS=ON -DINCLUDE_GRAPHQL_BUNDLES=OFF -DPROCESS_CONFIG_TYPE=sm .. && make clean all) && mv process.wasm process.sm.wasm",
+    "build:sm": "(mkdir -p build && cd build && cmake -DINCLUDE_SQLITE_SYMBOLS=ON -DINCLUDE_GRAPHQL_BUNDLES=OFF -DPROCESS_CONFIG_TYPE=sm .. && make clean all) && mv process.wasm process.sm.wasm",
     "build:xxl": "(mkdir -p build && cd build && cmake -DINCLUDE_SQLITE_SYMBOLS=ON -DINCLUDE_GRAPHQL_BUNDLES=OFF -DPROCESS_CONFIG_TYPE=xxl .. && make clean all) && mv process.wasm process.xxl.wasm",
-    "build:bare": "(mkdir -p build && cd build && cmake -DINCLUDE_SQLITE_SYMBOLS=OFF -DINCLUDE_GRAPHQL_BUNDLES=OFF -DPROCESS_CONFIG_TYPE=sm .. && make clean all)",
-    "build:sandbox": "run-p bundle:* && (mkdir -p build && cd build && cmake -DINCLUDE_SQLITE_SYMBOLS=ON -DINCLUDE_GRAPHQL_BUNDLES=ON -DPROCESS_CONFIG_TYPE=sm .. && make clean all)",
+    "build:bare": "(mkdir -p build && cd build && cmake -DINCLUDE_SQLITE_SYMBOLS=OFF -DINCLUDE_GRAPHQL_BUNDLES=OFF -DPROCESS_CONFIG_TYPE=sm .. && make clean all) && mv process.wasm process.bare.wasm",
+    "build:sandbox": "run-p bundle:* && (mkdir -p build && cd build && cmake -DINCLUDE_SQLITE_SYMBOLS=ON -DINCLUDE_GRAPHQL_BUNDLES=ON -DPROCESS_CONFIG_TYPE=sm .. && make clean all) && mv process.wasm process.sandbox.wasm",
     "bundle:runtime": "node bundler.js @tilla/graphql packages/runtime/graphql",
     "bundle:server": "node bundler.js @tilla/graphql_server packages/server",
     "bundle:gateway": "node bundler.js @tilla/graphql_arweave_gateway packages/gateway",
+    "deploy:sm": "ao publish -w ./wallet.json process.sm.wasm -t Memory-Limit -v 1-gb -t Compute-Limit -v 9000000000000 -t Module-Format -v wasm64-unknown-emscripten-draft_2024_02_15 -t Name -v aos-graphql-sqlite-sm",
+    "deploy:xxl": "ao publish -w ./wallet.json process.xxl.wasm -t Memory-Limit -v 16-gb -t Compute-Limit -v 9000000000000 -t Module-Format -v wasm64-unknown-emscripten-draft_2024_02_15 -t Name -v aos-graphql-sqlite-xxl",
     "dev": "nodemon",
     "preinstall": "npx only-allow npm",
     "prepare": "husky",
@@ -32,5 +34,13 @@
     "only-allow": "^1.2.1",
     "sort-package-json": "^2.10.1",
     "standard": "^17.1.0"
+  },
+  "modules": {
+    "sqlite-sm": {
+      "latest": "_wjbCuCyUTmKAseOfEj0NzrCNUgKcMqBGaSzNySzMoY"
+    },
+    "sqlite-xxl": {
+      "latest": "2YKCk39de5PPdYcbMXSLf0nq9wfHSsOsjUY0U4T80Zw"
+    }
   }
 }
