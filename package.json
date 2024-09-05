@@ -19,18 +19,18 @@
     "start": "node --experimental-wasm-memory64 repl.js"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.4.0",
-    "@commitlint/config-conventional": "^19.2.2",
-    "@permaweb/ao-loader": "^0.0.35",
+    "@commitlint/cli": "^19.4.1",
+    "@commitlint/config-conventional": "^19.4.1",
+    "@permaweb/ao-loader": "^0.0.36",
     "chalk": "^5.3.0",
-    "husky": "^9.1.4",
-    "lint-staged": "^15.2.8",
+    "husky": "^9.1.5",
+    "lint-staged": "^15.2.10",
     "lua-json": "^1.0.1",
     "markdown-toc-gen": "^1.0.1",
     "nodemon": "^3.1.4",
     "npm-run-all": "^4.1.5",
     "only-allow": "^1.2.1",
-    "sort-package-json": "^2.10.0",
+    "sort-package-json": "^2.10.1",
     "standard": "^17.1.0"
   }
 }
