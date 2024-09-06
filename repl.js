@@ -103,7 +103,13 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
       Target: env.Process.Id,
       From: env.Process.Owner,
       Owner: env.Process.Owner,
+      Fee: randomInt(1_000_000, 1_500_000),
+      Quantity: randomInt(1_000_000, 1_500_000),
+      Reward: randomInt(1_000_000, 1_500_000),
+      'Block-Id': randomUUID(),
       'Block-Height': randomInt(1_000_000, 1_500_000),
+      'Block-Timestamp': new Date().getTime(),
+      'Block-Previous': randomUUID(),
       Module: env.Module.Id,
       Tags: [
         { name: 'Action', value: Action },

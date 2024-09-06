@@ -143,14 +143,14 @@ Gateway = require('@tilla/graphql_arweave_gateway.init').aos({ continue = true }
 
 ## Outstanding Issues
 
-1. Some values available on Arweave Gateways are not available on `ao` messages
-   and so cannot be resolved by the Graph. For now, these values will always be
-   set to `nil`:
+1. Some values available on Arweave Gateways are not available on `ao` messages. Instead these values need to set from other parts of an ao message ie. off of `Data` or `Tags`:
 
 - `fee`
 - `quantity`
 - `bundledIn`
 - `block` (timestamp, id, previous -- we _do_ have `height`)
+
+You can see the expected shape for indexing [here](https://github.com/TillaTheHun0/aos-graphql/blob/251a4020bdb0fc369792d5582c44a795ccf63502/packages/gateway/api.lua#L54)
 
 2. `block` and `blocks` queries are currently not implemented due to not being
    comprehensively available on `ao`

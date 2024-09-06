@@ -51,14 +51,15 @@ local function createApis (args)
     return results, _next
   end
 
-  --[[
-    TODO: some fields are not present on a msg and so are currently mapped to nil:
-    - fee
-    - quantity
-    - bundle_id
-    - block related metadata (timestamp, id, previous -- we _do_ have height)
-  ]]
   apis.saveTransaction = function (msg)
+    local MsgBlock = msg.Block or {}
+
+    local block = {}
+    block.id = MsgBlock.Id or msg['Block-Id']
+    block.height = MsgBlock.Height or msg['Block-Height']
+    block.timestamp = MsgBlock.Timestamp or msg['Block-Timestamp']
+    block.previous = MsgBlock.Previous or msg['Block-Previous']
+
     local transaction = {
       id = msg.Id,
       anchor = msg.Anchor,
@@ -66,16 +67,11 @@ local function createApis (args)
       owner = {
         address = msg.Owner
       },
-      fee = nil,
-      quantity = nil,
+      fee = msg.Fee,
+      quantity = msg.Quantity,
       tags = msg.TagArray,
-      block = {
-        id = nil,
-        height = msg['Block-Height'],
-        timestamp = nil,
-        previous = nil
-      },
-      bundle_id = nil,
+      block = block,
+      bundle_id = msg['Bundle-Id'],
       recipient = msg.Target,
       timestamp = msg.Timestamp
     }
