@@ -1,10 +1,11 @@
 local server = require('@tilla/graphql_server.init')
 
+local Apis = require('@tilla/graphql_arweave_gateway.api')
 local utils = require('@tilla/graphql_arweave_gateway.utils')
-local api = require('@tilla/graphql_arweave_gateway.api')
 local schema = require('@tilla/graphql_arweave_gateway.schema.init')
 
-local Gateway = { _version = "0.0.4" }
+local Gateway = { _version = "0.0.5" }
+Gateway.__index = Gateway
 
 local function maybeRequire(moduleName)
   local ok, result, err = pcall(require, moduleName)
@@ -54,10 +55,9 @@ Gateway.new = function (args)
   end
 
   -- Compose Business logic on top of data access layer
-  local apis = api.createApis({ dal = dal })
+  local apis = Apis.new({ dal = dal })
 
-  -- Expose apis
-  self.index = apis.saveTransaction
+  -- Expose apis, dal, mostly for debugging purposes
   self.apis = apis
   self.dal = dal
 
@@ -114,12 +114,20 @@ Gateway.aos = function (args)
       return defaultMatch(msg)
     end,
     function (msg)
-      self.apis.saveTransaction(msg)
+      self:index(msg)
       print(string.format('Indexed message "%s"', msg.Id))
     end
   )
 
   return self
+end
+
+function Gateway:resolve (operation, variables)
+  return self.gql:resolve(operation, variables)
+end
+
+function Gateway:index (msg)
+  return self.apis.saveTransaction(msg)
 end
 
 return Gateway

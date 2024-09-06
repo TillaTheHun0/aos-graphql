@@ -1,5 +1,5 @@
 {
-  "watch": ["repl.js", "process.wasm"],
+  "watch": ["repl.js", "process.sandbox.wasm"],
   "exec": "node --experimental-wasm-memory64 repl.js",
   "delay": 500,
   "stdin": false

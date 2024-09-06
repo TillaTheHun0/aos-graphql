@@ -1,7 +1,9 @@
 
 local utils = require('@tilla/graphql_arweave_gateway.utils')
 
-local function createApis (args)
+local Apis = {}
+
+function Apis.new (args)
   local dal = args.dal
 
   local apis = {}
@@ -84,6 +86,4 @@ local function createApis (args)
   return apis
 end
 
-return {
-  createApis = createApis
-}
+return Apis

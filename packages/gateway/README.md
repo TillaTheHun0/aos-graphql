@@ -61,11 +61,11 @@ You can create a standalone Arweave GraphQL Indexer+Gateway:
 ```lua
 Gateway = require('@tilla/graphql_arweave_gateway.init').new()
 
--- save a transaction to be indexed
-Gateway.saveTransaction(msg)
+-- index a transaction
+Gateway:index(msg)
 
--- send an operation to the GraphQL Server
-Gateway.gql:resolve([[
+-- resolve an operation using the Gateway GraphQL Server
+Gateway:resolve([[
   query GetTransactions {
     transactions {
       edges {
@@ -91,6 +91,8 @@ Indexing is done using `sqlite`. In the future, we may add support for
 implementing indexing using other types of persistence.
 
 > TODO: add docs on custom persistence types
+
+You can see the expected input shape for `Gateway:index` [here](https://github.com/TillaTheHun0/aos-graphql/blob/main/packages/gateway/api.lua#L54)
 
 ### `aos` Handlers
 
@@ -143,14 +145,14 @@ Gateway = require('@tilla/graphql_arweave_gateway.init').aos({ continue = true }
 
 ## Outstanding Issues
 
-1. Some values available on Arweave Gateways are not available on `ao` messages. Instead these values need to set from other parts of an ao message ie. off of `Data` or `Tags`:
+1. Some values available on Arweave Gateways are not natively available on `ao` messages.
 
 - `fee`
 - `quantity`
 - `bundledIn`
 - `block` (timestamp, id, previous -- we _do_ have `height`)
 
-You can see the expected shape for indexing [here](https://github.com/TillaTheHun0/aos-graphql/blob/251a4020bdb0fc369792d5582c44a795ccf63502/packages/gateway/api.lua#L54)
+If you'd like those values indexed, then you will need to map those values from native fields off of the `ao` message ie. `Data` or `Tags`. You can see the expected input shape for indexing [here](https://github.com/TillaTheHun0/aos-graphql/blob/main/packages/gateway/api.lua#L54)
 
 2. `block` and `blocks` queries are currently not implemented due to not being
    comprehensively available on `ao`
