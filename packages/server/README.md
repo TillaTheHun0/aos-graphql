@@ -85,7 +85,7 @@ This will add an `aos` handler named `GraphQL.Server` that will handle any
 `Action = "GraphQL.Operation"` msgs received by the process.
 
 The resolved graphql operation will be sent back as a message, whose `Data`
-contains the result of the operation.
+contains the result of the operation, and `Action` tag is `GraphQL.Resolved`.
 
 You can also still send operations directly to your `gql` server:
 

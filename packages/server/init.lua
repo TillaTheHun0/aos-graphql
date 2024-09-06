@@ -5,11 +5,12 @@ local validate = graphql.validate
 local execute = graphql.execute
 
 local Server = {
-  _version = '0.0.2',
+  _version = '0.0.3',
   constants = {
     aos = {
       ServerHandler = 'GraphQL.Server',
-      MessageAction = 'GraphQL.Operation'
+      MessageAction = 'GraphQL.Operation',
+      ResolvedAction = 'GraphQL.Resolved'
     }
   }
 }
@@ -56,7 +57,7 @@ Server.aos = function (args)
       local info = { msg = msg, ao = ao }
       local result = gql:resolve(operation, variables, info)
 
-      ao.send({ Target = msg.From, Data = result })
+      ao.send({ Target = msg.From, Action = gql.constants.aos.ResolvedAction, Data = result })
     end
   )
 
