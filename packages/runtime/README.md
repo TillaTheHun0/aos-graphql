@@ -43,6 +43,35 @@ local types = require('@tilla/graphql.types')
 local validate = require('@tilla/graphql.validate')
 local execute = require('@tilla/graphql.execute')
 
+local Bob = {
+  id = 'id-1',
+  firstName = 'Bob',
+  lastName = 'Ross',
+  age = 52
+}
+local Jane = {
+  id = 'id-2',
+  firstName = 'Jane',
+  lastName = 'Doe',
+  age = 40
+}
+local John = {
+  id = 'id-3',
+  firstName = 'John',
+  lastName = 'Locke',
+  age = 44
+}
+
+-- Mock db
+local db = { Bob, Jane, John }
+-- Index by id
+local dbById = {}
+for k, v in ipairs(db) do dbById[v.id] = v end
+
+local function findPersonById (id)
+  return dbById[id]
+end
+
 --[[
   First define your types and resolvers
 
@@ -80,15 +109,9 @@ local schema = schema.create({
           id = types.id,
           defaultValue = 1
         },
-        resolve = function(rootValue, arguments, context, info)
-          if arguments.id ~= 1 then return nil end
-
-          return {
-            id = 1,
-            firstName = 'Bob',
-            lastName = 'Ross',
-            age = 52
-          }
+        resolve = function(rootValue, arguments, contextValue, info)
+          local findPersonById = contextValue.findPersonById
+          return findPersonById(arguments.id)
         end
       }
     }
@@ -101,7 +124,7 @@ local schema = schema.create({
 
 -- Parse a query
 local ast = parse [[
-query getUser($id: ID) {
+query GetPerson($id: ID) {
   person(id: $id) {
     firstName
     lastName
@@ -114,9 +137,9 @@ validate(schema, ast)
 
 -- Execution
 local rootValue = {}
-local contextValue = {}
+local contextValue = { findPersonById = findPersonById }
 local variables = { id = 1 }
-local operationName = 'getUser'
+local operationName = 'GetPerson'
 
 execute(schema, ast, rootValue, contextValue, variables, operationName)
 
