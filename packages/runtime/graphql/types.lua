@@ -295,8 +295,8 @@ local function isLong(value)
 end
 
 local function coerceLong(value)
-  if value ~= nil then
-    value = tonumber64(value)
+  if type(value) ~= 'number' then
+    value = tonumber(value)
   end
   return value
 end
