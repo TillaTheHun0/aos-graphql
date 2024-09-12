@@ -141,7 +141,8 @@ local function coerceValue(node, schemaType, variables, opts)
   end
 
   if node.kind == 'null' then
-    return box.NULL
+    -- return box.NULL
+    return nil
   end
 
   if schemaType.__type == 'List' then

@@ -378,13 +378,20 @@ evaluateSelections = function(objectType, object, selections, context)
     result[field.name], err = getFieldEntry(objectType, object, {field.selection},
                                        context)
     if err ~= nil then
-        context.errors = context.errors or {}
-        table.insert(context.errors, err)
+      context.errors = context.errors or {}
+      table.insert(context.errors, err)
     end
-    if result[field.name] == nil then
-        result[field.name] = box.NULL
-    end
+    -- if result[field.name] == nil then
+    --   result[field.name] = box.NULL
+    -- end
   end
+
+  --[[
+    if the result is empty, no fields were resolved,
+    so simply return nil
+  ]]
+  if next(result) == nil then result = nil end
+
   return result, context.errors
 end
 
