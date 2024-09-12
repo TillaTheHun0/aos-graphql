@@ -139,7 +139,7 @@ validate(schema, ast)
 local rootValue = {}
 local contextValue = { findPersonById = findPersonById }
 local variables = { id = 1 }
-local operationName = 'GetPerson'
+local operationName = nil
 
 execute(schema, ast, rootValue, contextValue, variables, operationName)
 
