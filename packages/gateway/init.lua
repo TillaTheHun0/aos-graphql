@@ -114,7 +114,39 @@ Gateway.aos = function (args)
       return defaultMatch(msg)
     end,
     function (msg)
-      self:index(msg)
+      local tx = utils.mergeAll({
+        msg,
+        --[[
+          Some fields that can be indexed are not available on
+          an ao message natively, and so are explictly set to nil
+          here.
+
+          TODO: maybe eventually support pulling values from other
+          parts of the message ie. Tags
+        ]]
+        {
+          id = msg.Id,
+          anchor = msg.Anchor,
+          signature = msg.Signature,
+          owner = {
+            address = msg.Owner
+          },
+          fee = nil,
+          quantity = nil,
+          tags = msg.TagArray,
+          block = {
+            id = nil,
+            height = msg['Block-Height'],
+            timestamp = nil,
+            previous = nil
+          },
+          bundle_id = nil,
+          recipient = msg.Target,
+          timestamp = msg.Timestamp
+        }
+      })
+
+      self:index(tx)
       print(string.format('Indexed message "%s"', msg.Id))
     end
   )
@@ -126,8 +158,8 @@ function Gateway:resolve (operation, variables)
   return self.gql:resolve(operation, variables)
 end
 
-function Gateway:index (msg)
-  return self.apis.saveTransaction(msg)
+function Gateway:index (tx)
+  return self.apis.saveTransaction(tx)
 end
 
 return Gateway

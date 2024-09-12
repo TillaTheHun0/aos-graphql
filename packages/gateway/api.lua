@@ -53,30 +53,16 @@ function Apis.new (args)
     return results, _next
   end
 
-  apis.saveTransaction = function (msg)
-    local MsgBlock = msg.Block or {}
+  apis.saveTransaction = function (tx)
+    local MsgBlock = tx.Block or {}
 
     local block = {}
-    block.id = MsgBlock.Id or msg['Block-Id']
-    block.height = MsgBlock.Height or msg['Block-Height']
-    block.timestamp = MsgBlock.Timestamp or msg['Block-Timestamp']
-    block.previous = MsgBlock.Previous or msg['Block-Previous']
+    block.id = MsgBlock.Id or tx['Block-Id']
+    block.height = MsgBlock.Height or tx['Block-Height']
+    block.timestamp = MsgBlock.Timestamp or tx['Block-Timestamp']
+    block.previous = MsgBlock.Previous or tx['Block-Previous']
 
-    local transaction = {
-      id = msg.Id,
-      anchor = msg.Anchor,
-      signature = msg.Signature,
-      owner = {
-        address = msg.Owner
-      },
-      fee = msg.Fee,
-      quantity = msg.Quantity,
-      tags = msg.TagArray,
-      block = block,
-      bundle_id = msg['Bundle-Id'],
-      recipient = msg.Target,
-      timestamp = msg.Timestamp
-    }
+    local transaction = utils.mergeAll({ tx, { block = block }})
 
     dal.saveTransaction(transaction)
 
