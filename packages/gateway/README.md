@@ -13,6 +13,7 @@ Gateway schema.
 - [Usage](#usage)
   - [Standalone Gateway](#standalone-gateway)
   - [Indexing](#indexing)
+    - [Indexing Implementation](#indexing-implementation)
   - [`aos` Handlers](#aos-handlers)
     - [Assignments](#assignments)
     - [Options](#options)
@@ -157,7 +158,7 @@ local Gateway = gateway.new({
   },
   limit = 10, -- will always be 1 <= limit <= 1000
   sort = 'desc' -- always 'desc' or 'asc'
-  after = { id = '...', timestamp = '...', height = 123 } -- optional
+  after = { id = '...', timestamp = 123, height = 123 } -- optional
 }
 
 -- tx will be shaped like the Transaction example above
