@@ -79,8 +79,8 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
       console.log(chalk.blue([
         'Example:',
         '',
-        'Gql:resolve(\'query GetPerson ($id: ID!) { person (id: $id) { firstName, lastName, age } }\', { id = "id-2" })',
-        'Gql:resolve(\'query GetPersons { persons { firstName, lastName } }\''
+        'Gql:resolve(\'query GetPerson ($id: ID!) { person (id: $id) { firstName, lastName, age, friends { firstName, age } } }\', { id = "id-2" })',
+        'Gql:resolve(\'query GetPeople { people { firstName, lastName } }\')'
       ].join('\n')))
       const init = readFileSync(join(__dirname, 'server.lua'), 'utf-8')
       line = init

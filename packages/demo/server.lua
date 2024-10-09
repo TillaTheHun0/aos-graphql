@@ -41,6 +41,7 @@ end
 
 -- Schema
 
+local person
 person = types.object({
   name = 'Person',
   fields = function ()

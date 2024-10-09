@@ -7,32 +7,7 @@
   local graphql = require('@tilla/graphql')
   local server = require('@tilla/graphql_server')
 
-  local schema, types = graphql.schema, graphql.types
-
-
-  local function reduce (fn, initial, t)
-    assert(type(fn) == "function", "first argument should be a function that accepts (result, value, key)")
-    local result = initial
-    for k, v in pairs(t) do
-      if result == nil then
-        result = v
-      else
-        result = fn(result, v, k)
-      end
-    end
-    return result
-  end
-
-  local function map (fn, t)
-    return reduce(
-      function (result, v, k)
-        result[k] = fn(v, k)
-        return result
-      end,
-      {},
-      t
-    )
-  end
+  local _schema, types = graphql.schema, graphql.types
 
   local Bob = {
     id = 'id-1',
@@ -57,67 +32,78 @@
   -- Mock db
   local db = { Bob, Jane, John }
 
-  -- Mock db primary index
-  local dbById = reduce(
-    function (acc, v) acc[v.id] = v; return acc end,
-    {},
-    db
-  )
+  -- primary index
+  local dbById = {}
+  for _, v in ipairs(db) do dbById[v.id] = v end
 
-  -- Create a type
-  Person = types.object({
+  local function findPersonById (id)
+    return dbById[id]
+  end
+
+  local person
+  person = types.object({
     name = 'Person',
     fields = function ()
       return {
         id = types.id.nonNull,
         firstName = types.string.nonNull,
+        middleName = types.string,
         lastName = types.string.nonNull,
         age = types.int.nonNull,
         friends = {
-          kind = types.list(Person.nonNull).nonNull,
+          kind = types.list(person.nonNull).nonNull,
           resolve = function (parent, _, contextValue)
-            local person = contextValue.dbById[parent.id]
-            return map(
-              function (id) return contextValue.dbById[id] end,
-              person.friends or {}
-            )
+            local findPersonById = contextValue.findPersonById
+
+            local p = findPersonById(parent.id)
+
+            local friends = {}
+            for _, id in ipairs(p.friends) do
+              table.insert(friends, findPersonById(id))
+            end
+
+            return friends
           end
         }
       }
     end
   })
 
-  -- Create a Query
-  local PersonQuery = {
-    kind = Person,
-    arguments = {
-      id = types.id
-    },
-    resolve = function (_, arguments, contextValue)
-      return contextValue.dbById[arguments.id or 'id-3']
-    end
-  }
-
-  local PersonsQuery = {
-    kind = types.list(Person.nonNull).nonNull,
-    resolve = function (_, _, contextValue)
-      return contextValue.db
-    end
-  }
-
-  -- Create the schema
-  local Schema = schema.create({
+  local schema = _schema.create({
     query = types.object({
       name = 'Query',
       fields = {
-        person = PersonQuery,
-        persons = PersonsQuery
+        person = {
+          kind = person,
+          arguments = {
+            id = {
+              kind = types.id,
+              defaultValue = 'id-1'
+            }
+          },
+          resolve = function (_, arguments, contextValue)
+            local findPersonById = contextValue.findPersonById
+            return findPersonById(arguments.id)
+          end
+        },
+        people = {
+          kind = types.list(person.nonNull).nonNull,
+          resolve = function (_, _, contextValue)
+            local db = contextValue.db
+            return db
+          end
+        }
       }
     })
   })
 
   Gql = server.aos({
-    schema = Schema,
-    context = function () return { db = db, dbById = dbById } end
+    schema = schema,
+    context = function ()
+      return {
+        findPersonById = findPersonById,
+        db = db
+      }
+    end
   })
 end)()
