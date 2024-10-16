@@ -33,13 +33,7 @@ set(PROCESS_CONFIG_DEST ${DEST_DIR}/config.yml)
 set(PROCESS_WASM_ARTIFACT ${DEST_DIR}/process.wasm)
 set(PROCESS_WASM_DEST ${CMAKE_SOURCE_DIR}/process.wasm)
 
-set(EMXX_CFLAGS "-s MEMORY64=1 -O3 -msimd128 -fno-rtti -DNDEBUG \
--flto=full -s BUILD_AS_WORKER=1 -s EXPORT_ALL=1 \
--s EXPORT_ES6=1 -s MODULARIZE=1 -s INITIAL_MEMORY=10MB \
--s MAXIMUM_MEMORY=8GB -s ALLOW_MEMORY_GROWTH -s FORCE_FILESYSTEM=1 \
--s EXPORTED_FUNCTIONS=_main -s EXPORTED_RUNTIME_METHODS=callMain -s \
-NO_EXIT_RUNTIME=1 -Wno-unused-command-line-argument -Wno-experimental /lua-5.3.4/src/liblua.a -I/lua-5.3.4/src"
-)
+set(EMXX_CFLAGS "-s MEMORY64=1 -I/lua-5.3.4/src")
 
 set(BUILD_DEPS_LIST ${LIBS_DEST_DIR}/libgraphqlparser.a ${LIBS_DEST_DIR}/luagraphqlparser.a ${PROCESS_CONFIG_DEST})
 
