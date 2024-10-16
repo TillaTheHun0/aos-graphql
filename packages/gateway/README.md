@@ -30,7 +30,7 @@ You will need to have `aos` and it's built-in primitives ie. `json`, `bint`, and
 > lua bindings as part of your `ao` Module.
 >
 > As a convenience during development, these are copied as `libs` from
-> [here](../../ao_libs)
+> [aos modules](../../aos/modules/sqlite3/libs)
 
 You will need to have the
 [Lua GraphQL Runtime Implementation available](../runtime) You will also need to
