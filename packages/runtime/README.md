@@ -19,7 +19,7 @@ the GraphQL parser and lua bindings.
 
 ```sh
 # Spin up a aos-sqlite-graphql process with 1-gb memory limit
-aos --module="_wjbCuCyUTmKAseOfEj0NzrCNUgKcMqBGaSzNySzMoY"
+aos --module="Z6tG7HwtogBO3GlbIo8ZxIiCQIgqYqSpiCmgLImfe2c"
 ```
 
 ## Usage

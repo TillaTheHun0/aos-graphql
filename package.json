@@ -1,5 +1,6 @@
 {
   "name": "aos-graphql",
+  "version": "0.0.2",
   "description": "AOS modules for building with graphql. GraphQL Runtime implemented in Lua+C. ao GraphQL Server with aos integration. Arweave Gateway Implementation",
   "author": "Tyler Hall<tyler@hyper.io>",
   "type": "module",
@@ -37,10 +38,14 @@
   },
   "modules": {
     "sqlite-sm": {
-      "latest": "_wjbCuCyUTmKAseOfEj0NzrCNUgKcMqBGaSzNySzMoY"
+      "latest": "Z6tG7HwtogBO3GlbIo8ZxIiCQIgqYqSpiCmgLImfe2c",
+      "0.0.1": "_wjbCuCyUTmKAseOfEj0NzrCNUgKcMqBGaSzNySzMoY",
+      "0.0.2": "Z6tG7HwtogBO3GlbIo8ZxIiCQIgqYqSpiCmgLImfe2c"
     },
     "sqlite-xxl": {
-      "latest": "2YKCk39de5PPdYcbMXSLf0nq9wfHSsOsjUY0U4T80Zw"
+      "latest": "TS_dywRUGUAChKPYP0AGFzY4TD7uu-XGZPbAbLWK_8U",
+      "0.0.1": "2YKCk39de5PPdYcbMXSLf0nq9wfHSsOsjUY0U4T80Zw",
+      "0.0.2": "TS_dywRUGUAChKPYP0AGFzY4TD7uu-XGZPbAbLWK_8U"
     }
   }
 }

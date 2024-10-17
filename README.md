@@ -42,7 +42,7 @@ GraphQL Gateway API.
 
 ## Prerequisites
 
-- `ao` dev-cli `0.1.3`
+- `ao` dev-cli `0.1.6`
 - `cmake` and `make`
 - If running the `repl.js`, you'll need `NodeJS 22+` and `npm`
 
