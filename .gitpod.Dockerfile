@@ -18,7 +18,7 @@ RUN cd /workspace && \
   make build && \
   sudo make install
 
-RUN echo "trigger rebuild 1234"
+RUN echo "trigger rebuild 1235"
 
 # Install ao dev-cli
 RUN curl -fsSL https://install_ao.g8way.io | bash

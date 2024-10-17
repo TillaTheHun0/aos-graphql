@@ -38,7 +38,7 @@ set(EMXX_CFLAGS "-s MEMORY64=1 -I/lua-5.3.4/src")
 set(BUILD_DEPS_LIST ${LIBS_DEST_DIR}/libgraphqlparser.a ${LIBS_DEST_DIR}/luagraphqlparser.a ${PROCESS_CONFIG_DEST})
 
 # TODO: remove once 'ao exec' is working
-set(AO_IMAGE p3rmaw3b/ao:0.1.2)
+set(AO_IMAGE p3rmaw3b/ao:0.1.3)
 
 # Add the parser subdirectory
 # add_subdirectory(${PARSER_SRC_DIR})
