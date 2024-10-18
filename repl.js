@@ -11,6 +11,9 @@ import AoLoader from '@permaweb/ao-loader'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
+const METERING_FORMAT = 'wasm64-unknown-emscripten-draft_2024_10_16-metering'
+const WASM64_FORMAT = 'wasm64-unknown-emscripten-draft_2024_02_15'
+
 function binaryStream (WASM_FILE) {
   return Promise.resolve(Readable.toWeb(createReadStream(WASM_FILE)))
 }
@@ -38,7 +41,9 @@ function wasmResponse (stream) {
   return new Response(stream, { headers: { 'Content-Type': 'application/wasm' } })
 }
 
-async function replWith ({ ASSIGNABLE, stream, env }) {
+async function replWith ({ ASSIGNABLE, moduleFormat, stream, env }) {
+  if (moduleFormat === METERING_FORMAT) console.log(chalk.bgGreen('Using metering module format...'))
+
   let messageCount = 0
   const rl = readline.createInterface({
     input: process.stdin,
@@ -120,11 +125,11 @@ async function replWith ({ ASSIGNABLE, stream, env }) {
     }
   }
 
-  const handle = await WebAssembly.compileStreaming(wasmResponse(stream))
+  const handle = await WebAssembly.compileStreaming(wasmResponse(stream), { format: moduleFormat })
     .then((module) => AoLoader(
       (info, receiveInstance) => WebAssembly.instantiate(module, info).then(receiveInstance),
       {
-        format: 'wasm64-unknown-emscripten-draft_2024_02_15',
+        format: moduleFormat,
         memoryLimit: '2-gb',
         computeLimit: 9_000_000_000_000,
         inputEncoding: 'JSON-1',
@@ -171,6 +176,7 @@ replWith({
    */
   ASSIGNABLE: 'function (msg) return true end',
   stream: await binaryStream(process.env.WASM_FILE || './process.sandbox.wasm'),
+  moduleFormat: process.env.MODULE_FORMAT || WASM64_FORMAT,
   env: {
     Process: {
       Id: 'PROCESS_TEST',
